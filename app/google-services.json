@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "389286336874",
+    "firebase_url": "https://zapisy-8172e.firebaseio.com",
+    "project_id": "zapisy-8172e",
+    "storage_bucket": "zapisy-8172e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389286336874:android:e45b7d8a0fddc71db42d13",
+        "android_client_info": {
+          "package_name": "com.wolfmobileapps.zapisy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "389286336874-4r1v9o9spsgeci0b4s58gccisghe6m35.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wolfmobileapps.zapisy",
+            "certificate_hash": "75f179d8acb756a978069302282204015a31262a"
+          }
+        },
+        {
+          "client_id": "389286336874-e67em2j053av91rmc56qfo62f9reg4ov.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBszYqj9SvxcCMzP-5aN72TiZREh6WFyQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "389286336874-e67em2j053av91rmc56qfo62f9reg4ov.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
