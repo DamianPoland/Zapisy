@@ -13,69 +13,122 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textViewActivityWydarzenieTytul"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="TextView" />
+
+            <LinearLayout
+                android:id="@+id/linearLiaoutMiejsceiCzas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieTytul"
+                app:layout_constraintTop_toBottomOf="@+id/textViewActivityWydarzenieTytul"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="32dp"
+                    app:srcCompat="@drawable/zapisy_icon_transparent"/>
+
+                <TextView
+                    android:id="@+id/textViewActivityWydarzenieMiejsceICzas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="14sp"
+                    android:textStyle="italic"
+                    android:layout_gravity="center_vertical"
+                    app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieTytul"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewActivityWydarzenieTytul"
+                    tools:text="TextView" />
+            </LinearLayout>
+
+
+
+            <TextView
+                android:id="@+id/textViewActivityWydarzenieOpis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieTytul"
+                app:layout_constraintTop_toBottomOf="@+id/linearLiaoutMiejsceiCzas"
+                tools:text="TextView" />
 
 
             <Button
                 android:id="@+id/buttonDolacz"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_marginTop="16dp"
                 app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieOpis"
                 app:layout_constraintTop_toBottomOf="@+id/textViewActivityWydarzenieOpis"
-                tools:text="Button" />
+                tools:text="Button"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                android:background="@drawable/button_custom"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
 
-            <Button
-                android:id="@+id/buttonMapaFIREBASE"
+            <ImageView
+                android:id="@+id/googlePay"
                 android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="8dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:background="@color/wallet_bright_foreground_holo_light"
+                android:src="@drawable/googlepay_button_content"
+                app:layout_constraintBottom_toBottomOf="@+id/buttonDolacz"
+                app:layout_constraintStart_toEndOf="@+id/buttonDolacz"
+                app:layout_constraintTop_toTopOf="@+id/buttonDolacz"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/textViewOstatniaNagranaTrasaFIREBASE"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Twoja zgłoszona trasa to:"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/buttonDolacz"
+                tools:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/imageViewMapaFIREBASE"
+                android:layout_width="80dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="24dp"
-                android:text="Mapa"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textViewOstatniaNagranaTrasaFIREBASE"
-                tools:visibility="visible" />
-
-            <Button
-                android:id="@+id/buttonStart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="Start"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewTrasa" />
-
-            <Button
-                android:id="@+id/buttonStop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:text="Stop"
-                app:layout_constraintStart_toEndOf="@+id/buttonStart"
-                app:layout_constraintTop_toTopOf="@+id/buttonStart" />
-
-            <Button
-                android:id="@+id/buttonWyslijTraseNaServer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Wyslij trase na server"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="@+id/buttonMapa"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-                tools:visibility="visible" />
-
-            <Button
-                android:id="@+id/buttonMapa"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:text="Mapa"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewOstatniaNagranaTrasa" />
+                tools:visibility="visible"
+                app:srcCompat="@drawable/map_button_transparent"
+                android:background="@drawable/item_selector"/>
 
             <LinearLayout
                 android:id="@+id/linearLayoutFIREBASE"
@@ -84,114 +137,34 @@
                 android:layout_marginStart="16dp"
                 android:orientation="vertical"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonMapaFIREBASE"
-                app:layout_constraintStart_toEndOf="@+id/buttonMapaFIREBASE"
-                app:layout_constraintTop_toTopOf="@+id/buttonMapaFIREBASE"
+                app:layout_constraintBottom_toBottomOf="@+id/imageViewMapaFIREBASE"
+                app:layout_constraintStart_toEndOf="@+id/imageViewMapaFIREBASE"
+                app:layout_constraintTop_toTopOf="@+id/imageViewMapaFIREBASE"
                 tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/textViewActivityWydarzenieDystansFIREBASE"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     tools:text="TextView" />
 
                 <TextView
                     android:id="@+id/textViewActivityWydarzenieCzasFIREBASE"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     tools:text="TextView" />
 
                 <TextView
                     android:id="@+id/textViewActivityWydarzeniePredkoscFIREBASE"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
+                    android:textSize="14sp"
                     tools:text="TextView" />
 
 
             </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/linearLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/buttonMapa"
-                app:layout_constraintStart_toEndOf="@+id/buttonMapa"
-                app:layout_constraintTop_toTopOf="@+id/buttonMapa">
-
-                <TextView
-                    android:id="@+id/textViewActivityWydarzenieDystans"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    tools:text="TextView" />
-
-                <TextView
-                    android:id="@+id/textViewActivityWydarzenieCzas"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    tools:text="TextView" />
-
-                <TextView
-                    android:id="@+id/textViewActivityWydarzeniePredkosc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    tools:text="TextView" />
-
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/textViewActivityWydarzenieTytul"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="TextView" />
-
-            <TextView
-                android:id="@+id/textViewActivityWydarzenieMiejsceICzas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieTytul"
-                app:layout_constraintTop_toBottomOf="@+id/textViewActivityWydarzenieTytul"
-                tools:text="TextView" />
-
-            <TextView
-                android:id="@+id/textViewActivityWydarzenieOpis"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textSize="20sp"
-                app:layout_constraintStart_toStartOf="@+id/textViewActivityWydarzenieTytul"
-                app:layout_constraintTop_toBottomOf="@+id/textViewActivityWydarzenieMiejsceICzas"
-                tools:text="TextView" />
-
-            <TextView
-                android:id="@+id/textViewOstatniaNagranaTrasaFIREBASE"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:text="Twoja zgłoszona trasa to:"
-                android:textSize="18sp"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/buttonDolacz"
-                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/textView"
@@ -206,12 +179,30 @@
                 android:id="@+id/textViewTrasa"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="Nagraj stwoją trasę"
-                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+            <ImageView
+                android:id="@+id/imageViewStartStop"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="Start"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTrasa"
+                app:srcCompat="@drawable/start_button_transparent"
+                android:background="@drawable/item_selector"/>
 
             <TextView
                 android:id="@+id/textView4"
@@ -219,19 +210,99 @@
                 android:layout_height="2dp"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorPrimary"
-                app:layout_constraintTop_toBottomOf="@+id/buttonStart"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewStartStop"
                 tools:layout_editor_absoluteX="98dp" />
 
             <TextView
                 android:id="@+id/textViewOstatniaNagranaTrasa"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Twoja ostatnia nagrana trasa to:"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+
+            <ImageView
+                android:id="@+id/imageViewMapa"
+                android:layout_width="80dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/item_selector"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewOstatniaNagranaTrasa"
+                app:srcCompat="@drawable/map_button_transparent" />
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/imageViewMapa"
+                app:layout_constraintStart_toEndOf="@+id/imageViewMapa"
+                app:layout_constraintTop_toTopOf="@+id/imageViewMapa">
+
+                <TextView
+                    android:id="@+id/textViewActivityWydarzenieDystans"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="TextView" />
+
+                <TextView
+                    android:id="@+id/textViewActivityWydarzenieCzas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="TextView" />
+
+                <TextView
+                    android:id="@+id/textViewActivityWydarzeniePredkosc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="TextView" />
+
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/buttonWyslijTraseNaServer"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:text="Wyslij trase na server"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/imageViewMapa"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                tools:visibility="visible"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                android:background="@drawable/button_custom"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"/>
+
+
+
+
+
+
+
+
+
+
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

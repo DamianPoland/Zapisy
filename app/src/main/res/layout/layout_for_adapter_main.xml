@@ -1,22 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/textViewTytul"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22sp" />
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginStart="16dp"
+        tools:text="toolsTextTemat" />
 
-    <TextView
-        android:id="@+id/textViewMiejsceICzas"
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp" />
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="32dp"
+            app:srcCompat="@drawable/zapisy_icon_transparent"/>
+
+        <TextView
+            android:id="@+id/textViewMiejsceICzas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            tools:text="toolsTextCzas i data"
+            android:layout_gravity="center_vertical"
+
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/textViewODstepWLayoucie"
         android:layout_width="match_parent"
