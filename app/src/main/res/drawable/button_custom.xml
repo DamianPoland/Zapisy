@@ -7,18 +7,14 @@
 
     <corners android:radius="20dp" />
 
-
     <gradient
         android:endColor="#BF360C"
         android:startColor="#BF360C"
-        android:type="linear"
-        android:centerColor="#FF3D00"/>
-
-
-
-
-
+        android:centerColor="#FF3D00"
+        android:type="linear" />
     <stroke
         android:width="3dp"
         android:color="#B0BEC5" />
+
+
 </shape>

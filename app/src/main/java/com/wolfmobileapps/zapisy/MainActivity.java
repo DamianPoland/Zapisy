@@ -92,22 +92,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // ustawienie textu na textView OpisOgólny
-        textViewOpisOgolny.setText("Zapisy to aplikacja do zapisów online. \n\nZnajdziesz tu aktualne wydarzenia z całej Polski. Aby się zapisać lud dowiedzieć więcej kliknij w wydarzenie.");
+        textViewOpisOgolny.setText("Znajdziesz tu aktualne wydarzenia z całej Polski. Aby się zapisać lud dowiedzieć więcej kliknij w wydarzenie.");
 
         // ustawienie textu na textView Wydarzenia
         textViewWydarzenia.setText("Wydarzenia:");
+
+
+//        //ustawienie action bara
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        setTitle("");
 
         // do Firebase instancja Database
         myRef = FirebaseDatabase.getInstance().getReference("Wydarzenia");
 
         //zapis w firebase
-//        Wydarzenie wyd1 = new Wydarzenie("Czwartki lekkoatletyczne w Bojanie - jesień 2019, konkurs 5", "Bojano 2019-10-10 17:00", "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)\nJeden bieg do wyboru:\ndziewczęta - 60m, 300m, 600m \nchłopcy - 60m, 300m, 1000m\noraz \njedna konkurencja techniczna:\nskok w dal, rzut piłeczką palantową, pchnięcie kulą (tylko dla 13 latków)", 1);
-//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "Przyjaźń k. Żukowa 2019-10-12 09:30", "Podstawowe informacje:\nBiuro Zawodów:  Przyjaźń, ul. Szkolna 2, czynne od godz. 09:00\nStart i Meta: Przyjaźń, ul. Szkolna 2", 2);
-//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa", "Przyjaźń 2019-10-12 10:50", "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń i Glincz – urokliwe wsie Gminy Żukowo.", 3);
-//        Wydarzenie wyd4 = new Wydarzenie("VII Bieg Przyjaźni", "Przyjaźń k. Żukowa 2019-10-12 11:00", "Opłać swój udział i wystartuj w całym cyklu Kaszuby Biegają 2019", 0);
-//        Wydarzenie wyd5 = new Wydarzenie("Przyjaźń na 5", "Przyjaźń k. Żukowa 2019-10-12 11:04", "\u200BPodstawowe informacje:\nBiuro Zawodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", 0);
-//        Wydarzenie wyd6 = new Wydarzenie("Marsz Nordic Walking - Festiwal Zdrowia", "Przyjaźń 2019-10-12 11:07", "", 0);
-//        Wydarzenie wyd7 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "Wdzydze k. Kościerzyny 2020-06-12 19:30", "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 do 14 czerwca 2020 roku.\nFestiwal Biegów Polski Północnej, odbywający się od dwóch lat we Wdzydzach gm. Kościerzyna co roku cieszy się coraz większą popularnością i wielkim uznaniem wśród biegaczy.", 0);
+//        Wydarzenie wyd1 = new Wydarzenie("Czwartki lekkoatletyczne w Bojanie - jesień 2019, konkurs 5", "2019-10-10 17:00 Bojano", "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)\nJeden bieg do wyboru:\ndziewczęta - 60m, 300m, 600m \nchłopcy - 60m, 300m, 1000m\noraz \njedna konkurencja techniczna:\nskok w dal, rzut piłeczką palantową, pchnięcie kulą (tylko dla 13 latków)", 1);
+//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "2019-10-12 09:30 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów:  Przyjaźń, ul. Szkolna 2, czynne od godz. 09:00\nStart i Meta: Przyjaźń, ul. Szkolna 2", 2);
+//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa", "2019-10-12 10:50 Przyjaźń ", "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń i Glincz – urokliwe wsie Gminy Żukowo.", 3);
+//        Wydarzenie wyd4 = new Wydarzenie("VII Bieg Przyjaźni", "2019-10-12 11:00 Przyjaźń k. Żukowa ", "Opłać swój udział i wystartuj w całym cyklu Kaszuby Biegają 2019", 0);
+//        Wydarzenie wyd5 = new Wydarzenie("Przyjaźń na 5", "2019-10-12 11:04 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", 0);
+//        Wydarzenie wyd6 = new Wydarzenie("Marsz Nordic Walking - Festiwal Zdrowia", "2019-10-12 11:07 Przyjaźń ", "", 0);
+//        Wydarzenie wyd7 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "2020-06-12 19:30 Wdzydze k. Kościerzyny ", "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 do 14 czerwca 2020 roku.\nFestiwal Biegów Polski Północnej, odbywający się od dwóch lat we Wdzydzach gm. Kościerzyna co roku cieszy się coraz większą popularnością i wielkim uznaniem wśród biegaczy.", 0);
 //        myRef.child("wyd1").setValue(wyd1);
 //        myRef.child("wyd2").setValue(wyd2);
 //        myRef.child("wyd3").setValue(wyd3);

@@ -4,18 +4,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-
-    <item android:drawable="@android:color/holo_red_dark" android:state_selected="true">
-
-    </item>
-    <item android:drawable="@android:color/holo_red_dark" android:state_checked="true">
+    <item android:drawable="@color/colorPrimaryDark" android:state_pressed="true">
 
     </item>
-    <item android:drawable="@color/colorPrimaryWeryBright" android:state_pressed="true">
+    <item android:drawable="@android:color/white">
 
     </item>
-    <item android:drawable="@android:color/transparent">
 
-    </item>
+
 
 </selector>

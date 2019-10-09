@@ -4,7 +4,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -93,6 +95,16 @@ public class ActivityInfo extends AppCompatActivity {
         builder.setTitle(titule);
         if (titule.equals("Developer Info")) {
             builder.setIcon(R.drawable.wolf_icon);
+            builder.setNegativeButton("Odwiedź stronę", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Uri webpage = Uri.parse("http://wolfmobileapps.com");
+                    Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+            });
         }
         builder.setMessage(alertString);
         builder.setPositiveButton("ZAMKNIJ", new DialogInterface.OnClickListener() {

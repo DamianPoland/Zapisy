@@ -20,6 +20,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,8 +39,6 @@ import com.google.android.gms.wallet.PaymentDataRequest;
 import com.google.android.gms.wallet.PaymentsClient;
 import com.google.android.gms.wallet.Wallet;
 import com.google.android.gms.wallet.WalletConstants;
-
-import java.util.Optional;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,6 +71,12 @@ public class ActivityWydarzenie extends AppCompatActivity {
     public static final String KEY_MAP_POINTS_FROM_FIREBASE = "key punkty na mapie z firebase";
     public static final String KEY_MAP_POINTS_TO_INTENT_OPEN_MAP = "key map points to intent open map";
     public static final String KEY_TO_START_STOP = "key to star stop";
+    public static final String KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA = "key to visibility linLay nagrana trasa";
+    public static final String DEF_VALUE_TO_CHILD_OF_MY_REF_THIS_USER = "road";
+    public static final String DEF_VALUE_TO_SET_FULL_TIME = "00:00:00";
+    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY = "Nagraj trasę";
+    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE = "Trwa nagrywanie trasy...";
+
 
 
     //views
@@ -78,7 +84,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private TextView textViewActivityWydarzenieMiejsceICzas;
     private TextView textViewActivityWydarzenieOpis;
     private Button buttonDolacz;
-    private TextView textViewTrasa;
+    private TextView textViewNagrajTrase;
     private ImageView imageViewStartStop;
     private ImageView imageViewMapa;
     private TextView textViewActivityWydarzenieDystans;
@@ -91,6 +97,11 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private TextView textViewActivityWydarzenieCzasFIREBASE;
     private TextView textViewActivityWydarzeniePredkoscFIREBASE;
     private Button buttonWyslijTraseNaServer;
+    private Button buttonSkasujTrase;
+    private View imageViewgooglePay;
+    private LinearLayout linLayZgloszonaTrasa;
+    private LinearLayout linLayNagrajTrasę;
+    private LinearLayout linLayNagranaTrasa;
 
     //do Firebase Database
     private DatabaseReference myRef;
@@ -116,6 +127,11 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
     // do broadcast reciver
     private BroadcastReceiver updateUIReciver;
+
+    // do animation
+    private Animation animationDown;
+    private Animation animationUp;
+
 
 
     @Override
@@ -146,7 +162,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
         textViewActivityWydarzenieMiejsceICzas = findViewById(R.id.textViewActivityWydarzenieMiejsceICzas);
         textViewActivityWydarzenieOpis = findViewById(R.id.textViewActivityWydarzenieOpis);
         buttonDolacz = findViewById(R.id.buttonDolacz);
-        textViewTrasa = findViewById(R.id.textViewTrasa);
+        textViewNagrajTrase = findViewById(R.id.textViewNagrajTrase);
         imageViewStartStop = findViewById(R.id.imageViewStartStop);
         imageViewMapa = findViewById(R.id.imageViewMapa);
         textViewActivityWydarzenieDystans = findViewById(R.id.textViewActivityWydarzenieDystans);
@@ -159,26 +175,36 @@ public class ActivityWydarzenie extends AppCompatActivity {
         textViewActivityWydarzenieCzasFIREBASE = findViewById(R.id.textViewActivityWydarzenieCzasFIREBASE);
         textViewActivityWydarzeniePredkoscFIREBASE = findViewById(R.id.textViewActivityWydarzeniePredkoscFIREBASE);
         buttonWyslijTraseNaServer = findViewById(R.id.buttonWyslijTraseNaServer);
+        buttonSkasujTrase = findViewById(R.id.buttonSkasujTrase);
+        imageViewgooglePay = findViewById(R.id.imageViewgooglePay);
+        linLayZgloszonaTrasa = findViewById(R.id.linLayZgloszonaTrasa);
+        linLayNagrajTrasę = findViewById(R.id.linLayNagrajTrasę);
+        linLayNagranaTrasa = findViewById(R.id.lanLayNagranaTrasa);
 
         //ustawienie tekstów
         textViewActivityWydarzenieTytul.setText(tytul);
         textViewActivityWydarzenieMiejsceICzas.setText(miejsceICzas);
         textViewActivityWydarzenieOpis.setText(opis);
+        textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
 
-        //ustawienie tekstu dołącz
+        //ustawienie tekstu dołącz i przycisku googlePay
         if (cena == 0) {
             buttonDolacz.setText("Dołącz");
+            imageViewgooglePay.setVisibility(View.GONE);
         } else {
-            buttonDolacz.setText("Dołącz (opłata: " + cena + " zł)");
+            buttonDolacz.setText("Dołącz (" + cena + " zł)");
         }
 
         //ustawienie przycisku start stop
         if (shar.getBoolean(KEY_TO_START_STOP, true)) {
-            //ustawienie ikonki na start
+            //ustawienie ikonki na start i text view nagraj trasę
             imageViewStartStop.setImageDrawable(getDrawable(R.drawable.start_button_transparent));
+            textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
+
         } else {
-            //ustawienie ikonki na stop
+            //ustawienie ikonki na stop i text view nagraj trasę
             imageViewStartStop.setImageDrawable(getDrawable(R.drawable.stop_button_transparent));
+            textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE);
         }
 
         // ustawienie wyników z servisu w textViews
@@ -186,21 +212,23 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
         // do Firebase instancja Database
         myRef = FirebaseDatabase.getInstance().getReference(tytul);
+        myRefThisUser = myRef.child(userEmail);
+
+        //ustawienie animacji
+        animationDown = AnimationUtils.loadAnimation(ActivityWydarzenie.this, R.anim.anim_rotation_down);
+        animationDown.setDuration(1000);
+        animationUp = AnimationUtils.loadAnimation(ActivityWydarzenie.this, R.anim.anim_rotation_up);
+        animationUp.setDuration(1000);
 
         // ukrywa przycisk dołacz jak jest wysłane coś na serwer pod child user Email
-        myRefThisUser = myRef.child(userEmail);
         myRefThisUser.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                //ustawienie visibility odpowiednich pól jeśli już ktoś dołączył do danego wydarzenia
-                buttonDolacz.setVisibility(View.GONE);
-                buttonWyslijTraseNaServer.setVisibility(View.VISIBLE);
-                imageViewMapaFIREBASE.setVisibility(View.VISIBLE);
-                linearLayoutFIREBASE.setVisibility(View.VISIBLE);
-                textViewOstatniaNagranaTrasaFIREBASE.setVisibility(View.VISIBLE);
+                // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
+                changeViewsVisibilityAfterAddOrChangeChild(dataSnapshot);
 
-
+                // pobranie danych o zapisanej trasie z Firebase i wstawienie do textViewsFirebase
                 getDataFromFirebaseAndShowOnTextViews(dataSnapshot);
 
             } //działa gdy jest child dodany a za pierwszym razem dla każdego child czyli sam robi pentlę
@@ -208,6 +236,10 @@ public class ActivityWydarzenie extends AppCompatActivity {
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
+                // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
+                changeViewsVisibilityAfterAddOrChangeChild(dataSnapshot);
+
+                // pobranie danych o zapisanej trasie z Firebase i wstawienie do textViewsFirebase
                 getDataFromFirebaseAndShowOnTextViews(dataSnapshot);
 
             } //działa gdy jest child zmieniony
@@ -253,7 +285,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
             }
         });
 
-        // przycisk start
+        // przycisk startStop
         imageViewStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -270,9 +302,10 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     Intent intent = new Intent(ActivityWydarzenie.this, ServiceWydarzenie.class);
                     startService(intent);
 
-                    //ustawienie ikonki na stop
+                    //ustawienie ikonki na stop i nazwy text View Nagraj Trasę
                     imageViewStartStop.setImageDrawable(getDrawable(R.drawable.stop_button_transparent));
-                    //zapisanie do shar  że ma być stop
+                    textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE);
+                    //zapisanie do shar  że ma być stop i nazwy text View Nagraj Trasę
                     editor = shar.edit(); //wywołany edytor do zmian
                     editor.putBoolean(KEY_TO_START_STOP, false);
                     editor.apply(); // musi być na końcu aby zapisać zmiany w shar
@@ -283,13 +316,20 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     Intent intent = new Intent(ActivityWydarzenie.this, ServiceWydarzenie.class);
                     stopService(intent);
 
-                    //ustawienie ikonki na start
+                    //ustawienie ikonki na start i nazwy text View Nagraj Trasę
                     imageViewStartStop.setImageDrawable(getDrawable(R.drawable.start_button_transparent));
-                    //zapisanie do shar  że ma być start
+                    textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
+                    //zapisanie do shar  że ma być start i nazwy text View Nagraj Trasę
                     editor = shar.edit(); //wywołany edytor do zmian
                     editor.putBoolean(KEY_TO_START_STOP, true);
                     editor.apply(); // musi być na końcu aby zapisać zmiany w shar
 
+                    // ustawienie wisibility linLay do nagranej trasy
+                    editor = shar.edit(); //wywołany edytor do zmian
+                    editor.putBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, true);
+                    editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+                    //ustawienie visibility linLay do nagranej trasy
+                    changeViewsVisibilityNagranaTrasa();
                 }
 
             }
@@ -302,12 +342,53 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 // pobranie danych z shar Pref
                 float distance = shar.getFloat(KEY_DISTANCE, 0);
-                String fullTime = shar.getString(KEY_FULL_TIME, "00:00:00");
+                String fullTime = shar.getString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME);
                 float speed = shar.getFloat(KEY_SPEED, 0);
                 String mapPoints = shar.getString(KEY_MAP_POINTS, "");
 
+                if (fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)){
+                    Toast.makeText(ActivityWydarzenie.this, "Trasa jest zerowa!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 //wysłanie danych naserwer
                 sentDataToFirebase(distance, fullTime, speed, mapPoints);
+
+                // ustawienie wisibility linLay do nagranej trasy
+                editor = shar.edit(); //wywołany edytor do zmian
+                editor.putBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, false);
+                editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+
+                //ustawienie visibility linLay do nagranej trasy
+                changeViewsVisibilityNagranaTrasa();
+
+                //ustawienie danych zerowych w text views
+                setViewsFromServiseOncore();
+            }
+        });
+
+        // przycisk do kasowania trasy
+        buttonSkasujTrase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // zapisanie czasu i punktów na mapie w postaci stringa dp shared pref
+                editor = shar.edit(); //wywołany edytor do zmian
+                editor.putFloat(KEY_DISTANCE,0); // do Activity Wydarzenie
+                editor.putString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME); // do Activity Wydarzenie
+                editor.putFloat(KEY_SPEED,0); // do Activity Wydarzenie
+                editor.putString(KEY_MAP_POINTS, ""); // do activity z Mapą
+                editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+
+                //ustawienie danych zerowych w text views
+                setViewsFromServiseOncore();
+
+                // ustawienie wisibility linLay do nagranej trasy
+                editor = shar.edit(); //wywołany edytor do zmian
+                editor.putBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, false);
+                editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+                //ustawienie visibility linLay do nagranej trasy
+                changeViewsVisibilityNagranaTrasa();
             }
         });
 
@@ -370,8 +451,6 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
         // do płatności GooglePay - ustawia możliwość płatności jeśli cena jest większa niż zero
         if (cena > 0) {
-            buttonDolacz.setText("Dołącz");
-
             mPaymentsClient =
                     Wallet.getPaymentsClient(
                             this,
@@ -385,19 +464,73 @@ public class ActivityWydarzenie extends AppCompatActivity {
     } //koniec onCreate_____________________________________________________________________
 
 
+
+
+
+    // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
+    private void changeViewsVisibilityAfterAddOrChangeChild(DataSnapshot dataSnapshot){
+
+        // wyłączenie przycisków dołacz i do płątności
+        buttonDolacz.setVisibility(View.GONE);
+        imageViewgooglePay.setVisibility(View.GONE);
+
+        // włączenie linLay do nagrywania
+        linLayNagrajTrasę.setVisibility(View.VISIBLE);
+        linLayNagrajTrasę.startAnimation(animationDown);
+
+        // włączenie liLay z trasą z firebase
+        DaneTrasy daneTrasyFirebase = dataSnapshot.getValue(DaneTrasy.class);
+        String fullTimeTakenFIREBASE = daneTrasyFirebase.getFullTime();
+        if (!fullTimeTakenFIREBASE.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
+            linLayZgloszonaTrasa.setVisibility(View.VISIBLE);
+            linLayZgloszonaTrasa.startAnimation(animationDown);
+        }
+
+        //ustawienie visibility linLay do nagranej trasy
+        changeViewsVisibilityNagranaTrasa();
+    }
+
+    //ustawienie visibility linLay do nagranej trasy
+    private void changeViewsVisibilityNagranaTrasa(){
+        if (shar.getBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, false)) {
+            linLayNagranaTrasa.setVisibility(View.VISIBLE);
+            linLayNagranaTrasa.startAnimation(animationDown);
+        } else {
+            if (linLayNagranaTrasa.getVisibility()==View.VISIBLE){
+
+                linLayNagranaTrasa.startAnimation(animationUp);
+                // ustawienie animation listenera żeby po skończeniu animacji wyłączył widok
+                animationUp.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                    }
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        linLayNagranaTrasa.setVisibility(View.INVISIBLE);
+                    }
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+                    }
+                });
+            }
+        }
+    }
+
+
+
     // zgłoszenie uczestnictwa w wydarzeniu
     private void joinToEvent() {
 
         //ustawienie zerowych danych
         float distance = 0;
-        String fullTime = "00:00:00";
+        String fullTime = DEF_VALUE_TO_SET_FULL_TIME;
         float speed = 0;
         String mapPoints = "";
 
         //wysłanie uczestnictwa naserwer
         sentDataToFirebase(distance, fullTime, speed, mapPoints);
 
-        Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dołączenie do wydarzenia", Toast.LENGTH_LONG).show();
+        Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dołączenie do wydarzenia", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -428,10 +561,10 @@ public class ActivityWydarzenie extends AppCompatActivity {
         DaneTrasy daneTrasy = new DaneTrasy(distance, fullTime, speed, mapPoints);
 
         //wpisanie do Firebase uczestnictwa i odrazu trasy z zerowymi danymi lub ostatnimi
-        myRefThisUser.child("road").setValue(daneTrasy);
+        myRefThisUser.child(DEF_VALUE_TO_CHILD_OF_MY_REF_THIS_USER).setValue(daneTrasy);
 
         //jeśli będzie zero to znaczy że było tylko dołączenie a nie dodanie trasy więc nie wyświetli komunikatu
-        if (!fullTime.equals("00:00:00")) {
+        if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
             Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dodanie trasy", Toast.LENGTH_SHORT).show();
         }
     }
@@ -440,7 +573,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private void setViewsFromServiseOncore() {
         //pobranie czsu, predkosci i odległości z shared co się zapisało w servisie
         float distance = shar.getFloat(KEY_DISTANCE, 0);
-        String fullTime = shar.getString(KEY_FULL_TIME, "00:00:00");
+        String fullTime = shar.getString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME);
         float speed = shar.getFloat(KEY_SPEED, 0);
 
         // ustawienie danych w textViews
@@ -518,13 +651,6 @@ public class ActivityWydarzenie extends AppCompatActivity {
      */
     private PaymentsClient mPaymentsClient;
 
-    /**
-     * A Google Pay payment button presented to the viewer for interaction
-     *
-     * @see <a href="https://developers.google.com/pay/api/android/guides/brand-guidelines">Google Pay
-     * payment button brand guidelines</a>
-     */
-    private View mGooglePayButton;
 
     /**
      * A constant integer you define to track a request for payment data activity
@@ -557,15 +683,14 @@ public class ActivityWydarzenie extends AppCompatActivity {
                             boolean result = task.getResult(ApiException.class);
                             if (result) {
                                 // show Google as a payment option
-                                mGooglePayButton = findViewById(R.id.googlePay);
-                                mGooglePayButton.setOnClickListener(
+                                imageViewgooglePay.setOnClickListener(
                                         new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
                                                 requestPayment(view);
                                             }
                                         });
-                                mGooglePayButton.setVisibility(View.VISIBLE);
+                                imageViewgooglePay.setVisibility(View.VISIBLE);
                             }
                         } catch (ApiException exception) {
                             // handle developer errors
