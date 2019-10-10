@@ -2,6 +2,20 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        relesae {
+            storeFile file('D:\\JAVA\\archiwum\\keystore_klucz_do_aplikacji.jks')
+            storePassword 'Ninja1'
+            keyAlias = 'key1'
+            keyPassword 'Ninja1555'
+        }
+        debug {
+            storeFile file('D:\\JAVA\\archiwum\\keystore_klucz_do_aplikacji.jks')
+            storePassword 'Ninja1'
+            keyAlias = 'key1'
+            keyPassword 'Ninja1555'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.wolfmobileapps.zapisy"
@@ -15,6 +29,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.relesae
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
 }

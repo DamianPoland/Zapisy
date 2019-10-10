@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@color/color_background_gray200">
+    android:background="@color/colorBackgroundGray200">
 
     <LinearLayout
         android:id="@+id/linearLayoutMain"
@@ -41,7 +41,7 @@
             android:textSize="14sp"
             android:paddingTop="8dp"
             tools:text="Tools Opis"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:textColor="@color/colorPrimaryDarkBlue900"/>
 
     </LinearLayout>
 
@@ -78,7 +78,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewWydarzenia"
         android:dividerHeight="0dp"
-        android:divider="@color/color_background_gray200">
+        android:divider="@color/colorBackgroundGray200">
 
     </ListView>
 

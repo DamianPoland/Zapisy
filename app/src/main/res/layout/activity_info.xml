@@ -23,7 +23,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:text="O aplikacji"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="@color/colorAccentRed900"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +61,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/color_background_my" />
+                        android:background="@color/colorBackgroundGray200"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -93,7 +93,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/color_background_my" />
+                        android:background="@color/colorBackgroundGray200" />
 
                 </LinearLayout>
 
@@ -126,7 +126,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/color_background_my" />
+                        android:background="@color/colorBackgroundGray200" />
 
                 </LinearLayout>
 
@@ -160,7 +160,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/color_background_my" />
+                        android:background="@color/colorBackgroundGray200" />
 
                 </LinearLayout>
 
@@ -194,7 +194,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="16dp"
-                        android:background="@color/color_background_my" />
+                        android:background="@color/colorBackgroundGray200" />
 
 
                 </LinearLayout>

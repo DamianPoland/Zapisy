@@ -625,11 +625,14 @@ public class ActivityWydarzenie extends AppCompatActivity {
     }
 
 
-    //musi być bo do tego activity wchodzi po logowaniu i jak sie wcika bez tego to wariuje bo poprzednia strona jest tak naprawde logowania a nie MainActivity
-    @Override
+    //    @Override
     public void onBackPressed() {
+        //musi być bo do tego activity wchodzi po logowaniu i jak sie wcika bez tego to wariuje bo poprzednia strona jest tak naprawde logowania a nie MainActivity
         startActivity(new Intent(ActivityWydarzenie.this, MainActivity.class));
     }
+
+
+
 
     // odłączenie register recivera
 

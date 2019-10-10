@@ -2,11 +2,12 @@
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:color="@color/colorPrimaryDark">
+    android:color="@color/colorPrimaryDarkBlue900">
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
             <corners android:radius="20dp" />
-            <solid android:color="@color/colorPrimaryDark" />
+            <solid android:color="@color/colorPrimaryDarkBlue900" />
+            <corners android:radius="20dp" />
         </shape>
     </item>
 
@@ -19,13 +20,13 @@
             <corners android:radius="20dp" />
 
             <gradient
-                android:endColor="#BF360C"
-                android:startColor="#BF360C"
-                android:centerColor="#FF3D00"
+                android:endColor="@color/colorAccentRed900"
+                android:startColor="@color/colorAccentRed900"
+                android:centerColor="@color/colorAccentBrightRed600"
                 android:type="linear" />
             <stroke
                 android:width="3dp"
-                android:color="#B0BEC5" />
+                android:color="@color/colorBackgroundGray500" />
 
 
         </shape>

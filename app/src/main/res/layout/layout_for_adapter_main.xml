@@ -38,7 +38,7 @@
                 android:layout_marginStart="8dp"
                 android:textSize="14sp"
                 tools:text="toolsTextCzas i data"
-                android:textColor="@color/colorPrimaryDark"/>
+                android:textColor="@color/colorPrimaryDarkBlue900"/>
 
         </LinearLayout>
 
