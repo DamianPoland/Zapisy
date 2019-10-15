@@ -18,6 +18,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -298,6 +300,12 @@ public class ActivityWydarzenie extends AppCompatActivity {
                         return;
                     }
 
+                    //sprawdzeni czy GPS jest włączony
+                    if (!isLocationEnabled(ActivityWydarzenie.this)){
+                        Toast.makeText(ActivityWydarzenie.this, "GPS jest wyłączony!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     //włączenie servisu
                     Intent intent = new Intent(ActivityWydarzenie.this, ServiceWydarzenie.class);
                     startService(intent);
@@ -457,12 +465,11 @@ public class ActivityWydarzenie extends AppCompatActivity {
                             new Wallet.WalletOptions.Builder()
                                     .setEnvironment(WalletConstants.ENVIRONMENT_TEST)
                                     .build());
-            possiblyShowGooglePayButton();
+            possiblyShowGooglePayButton(); //startuje z tej metody i sprawdza czy są google pay aktywne i pokazuje button
         }
 
 
     } //koniec onCreate_____________________________________________________________________
-
 
 
 
@@ -624,18 +631,25 @@ public class ActivityWydarzenie extends AppCompatActivity {
         }
     }
 
-
     //    @Override
     public void onBackPressed() {
         //musi być bo do tego activity wchodzi po logowaniu i jak sie wcika bez tego to wariuje bo poprzednia strona jest tak naprawde logowania a nie MainActivity
         startActivity(new Intent(ActivityWydarzenie.this, MainActivity.class));
     }
 
-
-
+    //sprawdzenie czy GPS jest włączony
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        try {
+            locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+    }
 
     // odłączenie register recivera
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -646,35 +660,21 @@ public class ActivityWydarzenie extends AppCompatActivity {
     //-------------------------------------------------- Do goole pay----------------------------------------------------------------
 
 
-    /**
-     * A client for interacting with the Google Pay API
-     *
-     * @see <a
-     * href="https://developers.google.com/android/reference/com/google/android/gms/wallet/PaymentsClient">PaymentsClient</a>
-     */
     private PaymentsClient mPaymentsClient;
 
-
-    /**
-     * A constant integer you define to track a request for payment data activity
-     */
     private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 42;
 
 
-    /**
-     * Determine the viewer's ability to pay with a payment method supported by your app and display a
-     * Google Pay payment button
-     *
-     * @see <a
-     * href="https://developers.google.com/android/reference/com/google/android/gms/wallet/PaymentsClient#isReadyToPay(com.google.android.gms.wallet.IsReadyToPayRequest)">PaymentsClient#IsReadyToPay</a>
-     */
+    //startuje z tej metody i sprawdza czy są google pay aktywne i jesli tak to pokazuje button
     private void possiblyShowGooglePayButton() {
         if (GooglePay.getIsReadyToPayRequest() == null) {
+            Toast.makeText(this, "Google PAY są niedostępne", Toast.LENGTH_SHORT).show();
             return;
         }
         JSONObject isReadyToPayJson = GooglePay.getIsReadyToPayRequest();
         IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
         if (request == null) {
+            Toast.makeText(this, "Google PAY nie jest gotowe do wykonania płatności.", Toast.LENGTH_LONG).show();
             return;
         }
         Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
@@ -690,6 +690,8 @@ public class ActivityWydarzenie extends AppCompatActivity {
                                         new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
+
+                                                // po kliknięciu na button uruchamia tą metodę
                                                 requestPayment(view);
                                             }
                                         });
@@ -703,16 +705,12 @@ public class ActivityWydarzenie extends AppCompatActivity {
     }
 
 
-    /**
-     * Display the Google Pay payment sheet after interaction with the Google Pay payment button
-     *
-     * @param view optionally uniquely identify the interactive element prompting for payment
-     */
+    // po kliknięciu na button uruchamia tą metodę
     public void requestPayment(View view) {
-        if (GooglePay.getPaymentDataRequest() == null) {
+        if (GooglePay.getPaymentDataRequest(cena) == null) {
             return;
         }
-        JSONObject paymentDataRequestJson = GooglePay.getPaymentDataRequest();
+        JSONObject paymentDataRequestJson = GooglePay.getPaymentDataRequest(cena);
         PaymentDataRequest request =
                 PaymentDataRequest.fromJson(paymentDataRequestJson.toString());
         if (request != null) {
@@ -771,8 +769,11 @@ public class ActivityWydarzenie extends AppCompatActivity {
                             String billingName =
                                     paymentMethodData.getJSONObject("info").getJSONObject("billingAddress").getString("name");
                             Log.d("BillingName", billingName);
-                            Toast.makeText(this, "Successfully received payment data for %s!", Toast.LENGTH_LONG)
-                                    .show();
+                            Toast.makeText(this, "Płatność została dokonana. \nDziękujemy.", Toast.LENGTH_LONG).show();
+
+                            // włączyć metode z dołącz gdy zostało opłacone
+                            joinToEvent();
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -784,6 +785,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
                         break;
                     case AutoResolveHelper.RESULT_ERROR:
                         Status status = AutoResolveHelper.getStatusFromIntent(data);
+                        Toast.makeText(this, "ERROR. Nie dokonano płatności.", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onActivityResult: RESULT_ERROR: " + status.getStatusMessage());
                         break;
                     default:

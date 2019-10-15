@@ -1,8 +1,11 @@
 package com.wolfmobileapps.zapisy;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -104,13 +107,13 @@ public class MainActivity extends AppCompatActivity {
         myRef = FirebaseDatabase.getInstance().getReference("Wydarzenia");
 
         //zapis w firebase
-//        Wydarzenie wyd1 = new Wydarzenie("Czwartki lekkoatletyczne w Bojanie - jesień 2019, konkurs 5", "2019-10-10 17:00 Bojano", "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)\nJeden bieg do wyboru:\ndziewczęta - 60m, 300m, 600m \nchłopcy - 60m, 300m, 1000m\noraz \njedna konkurencja techniczna:\nskok w dal, rzut piłeczką palantową, pchnięcie kulą (tylko dla 13 latków)", 1);
-//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "2019-10-12 09:30 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów:  Przyjaźń, ul. Szkolna 2, czynne od godz. 09:00\nStart i Meta: Przyjaźń, ul. Szkolna 2", 2);
-//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa", "2019-10-12 10:50 Przyjaźń ", "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń i Glincz – urokliwe wsie Gminy Żukowo.", 3);
+//        Wydarzenie wyd1 = new Wydarzenie("Czwartki lekkoatletyczne w Bojanie - jesień 2019, konkurs 5", "2019-10-10 17:00 Bojano", "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)\nJeden bieg do wyboru:\ndziewczęta - 60m, 300m, 600m \nchłopcy - 60m, 300m, 1000m\noraz \njedna konkurencja techniczna:\nskok w dal, rzut piłeczką palantową, pchnięcie kulą (tylko dla 13 latków)", 0);
+//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "2019-10-12 09:30 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów:  Przyjaźń, ul. Szkolna 2, czynne od godz. 09:00\nStart i Meta: Przyjaźń, ul. Szkolna 2", 0);
+//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa", "2019-10-12 10:50 Przyjaźń ", "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń i Glincz – urokliwe wsie Gminy Żukowo.", 0);
 //        Wydarzenie wyd4 = new Wydarzenie("VII Bieg Przyjaźni", "2019-10-12 11:00 Przyjaźń k. Żukowa ", "Opłać swój udział i wystartuj w całym cyklu Kaszuby Biegają 2019", 0);
-//        Wydarzenie wyd5 = new Wydarzenie("Przyjaźń na 5", "2019-10-12 11:04 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", 0);
+//        Wydarzenie wyd5 = new Wydarzenie("Przyjaźń na 5", "2019-10-12 11:04 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", 1;
 //        Wydarzenie wyd6 = new Wydarzenie("Marsz Nordic Walking - Festiwal Zdrowia", "2019-10-12 11:07 Przyjaźń ", "", 0);
-//        Wydarzenie wyd7 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "2020-06-12 19:30 Wdzydze k. Kościerzyny ", "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 do 14 czerwca 2020 roku.\nFestiwal Biegów Polski Północnej, odbywający się od dwóch lat we Wdzydzach gm. Kościerzyna co roku cieszy się coraz większą popularnością i wielkim uznaniem wśród biegaczy.", 0);
+//        Wydarzenie wyd7 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "2020-06-12 19:30 Wdzydze k. Kościerzyny ", "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 do 14 czerwca 2020 roku.\nFestiwal Biegów Polski Północnej, odbywający się od dwóch lat we Wdzydzach gm. Kościerzyna co roku cieszy się coraz większą popularnością i wielkim uznaniem wśród biegaczy.", 2);
 //        myRef.child("wyd1").setValue(wyd1);
 //        myRef.child("wyd2").setValue(wyd2);
 //        myRef.child("wyd3").setValue(wyd3);
@@ -177,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user != null) {
 
                     // pobranie imienia i emailu użytkownika po zarejestrowaniu
@@ -207,27 +211,45 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } else {
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(Arrays.asList(
+
+                    // musi byc alert dialog bo inaczej jak ktoś kliknął onBackPressed to nie wracało do głównego activity a traz wraca
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Logowanie");
+                    builder.setMessage("Aby dowiedzieć się więcej musisz być zalogowany poprzez konto Google.");
+                    builder.setPositiveButton("Zaloguj", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            //odpalenie logowania
+                            startActivityForResult(
+                                    AuthUI.getInstance()
+                                            .createSignInIntentBuilder()
+                                            .setIsSmartLockEnabled(false)
+                                            .setAvailableProviders(Arrays.asList(
 //                                            new AuthUI.IdpConfig.AnonymousBuilder().build(),
 //                                            new AuthUI.IdpConfig.FacebookBuilder().build(),
 //                                            new AuthUI.IdpConfig.TwitterBuilder().build(),
 //                                            new AuthUI.IdpConfig.GitHubBuilder().build(),
 //                                            new AuthUI.IdpConfig.EmailBuilder().build(),
 //                                            new AuthUI.IdpConfig.PhoneBuilder().build(),
-                                            new AuthUI.IdpConfig.GoogleBuilder().build()))
-                                    .build(),
-                            RC_SIGN_IN);
+                                                    new AuthUI.IdpConfig.GoogleBuilder().build()))
+                                            .build(),
+                                    RC_SIGN_IN);
+                        }
+                    }).setNegativeButton("NIE loguj", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do something when click cancel
+                        }
+                    }).create();
+                    builder.show();
+
                 }
             }
         };
         //włącza listenera
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
-
 
     @Override
     protected void onResume() {
@@ -257,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_info:
                 startActivity(new Intent(MainActivity.this, ActivityInfo.class));
-
                 break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -273,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
 
     //musi być bo nie dziłało inaczej. Przenosiło do aplikacji poprzedniej a tera zamyka apke dobrze
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         Intent a = new Intent(Intent.ACTION_MAIN);
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
