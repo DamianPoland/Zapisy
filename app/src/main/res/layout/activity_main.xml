@@ -78,9 +78,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewWydarzenia"
         android:dividerHeight="0dp"
-        android:divider="@color/colorBackgroundGray200">
-
-    </ListView>
+        android:divider="@color/colorBackgroundGray200"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

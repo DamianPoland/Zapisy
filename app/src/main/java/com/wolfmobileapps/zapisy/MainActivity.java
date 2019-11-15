@@ -4,11 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,16 +16,22 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,9 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     //stałe do przeniesienia do activity wydarzenie
     public static final String TO_ACTIVITY_WYDARZENIE_TYTUL = "to activity wydarzenie tytul";
-    public static final String TO_ACTIVITY_WYDARZENIE_MIEJSCE_I_CZAS = "to activity wydarzenie miejsceICzas";
-    public static final String TO_ACTIVITY_WYDARZENIE_OPIS = "to activity wydarzenie opis";
+    public static final String TO_ACTIVITY_WYDARZENIE_DATA = "to activity wydarzenie miejsceICzas";
     public static final String TO_ACTIVITY_WYDARZENIE_CENA = "to activity wydarzenie cena";
+    public static final String TO_ACTIVITY_WYDARZENIE_OPIS = "to activity wydarzenie opis";
+    public static final String TO_ACTIVITY_WYDARZENIE_REGULAMIN = "to activity wydarzenie regulamin";
+    public static final String TO_ACTIVITY_WYDARZENIE_DYSTANS = "to activity wydarzenie dystans";
+    public static final String TO_ACTIVITY_WYDARZENIE_UCZESTNICY_ILOSC = "to activity wydarzenie uczestnicy ilosc";
+    public static final String TO_ACTIVITY_WYDARZENIE_HISTORIA = "to activity wydarzenie historia";
     public static final String TO_ACTIVITY_WYDARZENIE_USER_NAME = "to activity wydarzenie user name";
     public static final String TO_ACTIVITY_WYDARZENIE_USER_EMAIL = "to activity wydarzenie user email";
 
@@ -55,8 +65,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewWydarzenia;
     private ProgressBar progressBarWaiForFirebase;
 
+
     //do Firebase Database
-    private DatabaseReference myRef;
+    private FirebaseFirestore db;
+    public static final String COLLECTION_NAME_WYDARZENIE = "Wydarzenia";
+    public static final String COLLECTION_NAME_USERS = "Users";
+    private ListenerRegistration registration;
+
+
 
     // do Firebase Authetication
     private FirebaseAuth mFirebaseAuth;
@@ -101,61 +117,60 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
         getSupportActionBar().setDisplayUseLogoEnabled(true);
-        setTitle("");
+        setTitle(getResources().getString(R.string.app_name));
 
         // do Firebase instancja Database
-        myRef = FirebaseDatabase.getInstance().getReference("Wydarzenia");
-
-        //zapis w firebase
-//        Wydarzenie wyd1 = new Wydarzenie("Czwartki lekkoatletyczne w Bojanie - jesień 2019, konkurs 5", "2019-10-10 17:00 Bojano", "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)\nJeden bieg do wyboru:\ndziewczęta - 60m, 300m, 600m \nchłopcy - 60m, 300m, 1000m\noraz \njedna konkurencja techniczna:\nskok w dal, rzut piłeczką palantową, pchnięcie kulą (tylko dla 13 latków)", 0);
-//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "2019-10-12 09:30 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów:  Przyjaźń, ul. Szkolna 2, czynne od godz. 09:00\nStart i Meta: Przyjaźń, ul. Szkolna 2", 0);
-//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa", "2019-10-12 10:50 Przyjaźń ", "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń i Glincz – urokliwe wsie Gminy Żukowo.", 0);
-//        Wydarzenie wyd4 = new Wydarzenie("VII Bieg Przyjaźni", "2019-10-12 11:00 Przyjaźń k. Żukowa ", "Opłać swój udział i wystartuj w całym cyklu Kaszuby Biegają 2019", 0);
-//        Wydarzenie wyd5 = new Wydarzenie("Przyjaźń na 5", "2019-10-12 11:04 Przyjaźń k. Żukowa ", "Podstawowe informacje:\nBiuro Zawodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", 1;
-//        Wydarzenie wyd6 = new Wydarzenie("Marsz Nordic Walking - Festiwal Zdrowia", "2019-10-12 11:07 Przyjaźń ", "", 0);
-//        Wydarzenie wyd7 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "2020-06-12 19:30 Wdzydze k. Kościerzyny ", "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 do 14 czerwca 2020 roku.\nFestiwal Biegów Polski Północnej, odbywający się od dwóch lat we Wdzydzach gm. Kościerzyna co roku cieszy się coraz większą popularnością i wielkim uznaniem wśród biegaczy.", 2);
-//        myRef.child("wyd1").setValue(wyd1);
-//        myRef.child("wyd2").setValue(wyd2);
-//        myRef.child("wyd3").setValue(wyd3);
-//        myRef.child("wyd4").setValue(wyd4);
-//        myRef.child("wyd5").setValue(wyd5);
-//        myRef.child("wyd6").setValue(wyd6);
-//        myRef.child("wyd7").setValue(wyd7);
-
+        db = FirebaseFirestore.getInstance();
 
         //wyświetlenie w listView z Firebas
         listMain = new ArrayList<>();
         adapter = new WydarzeniaArrayAdapter(this, 0, listMain);
         listViewWydarzenia.setAdapter(adapter);
-        myRef.addChildEventListener(new ChildEventListener() {
+
+        //słucha wszystkiego cosię dzieje wdanym folderze tu "Wydarzenia", odpala się za każdym razem
+        CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE);
+        registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.d(TAG, "city listen:error", e);
+                    return;
+                }
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d(TAG, "New city: " + dc.getDocument().getData());
+                            //                // wyłączenie progress bara
+                            progressBarWaiForFirebase.setVisibility(View.GONE);
 
-                // wyłączenie progress bara
-                progressBarWaiForFirebase.setVisibility(View.GONE);
+                            //dodanie kolejnych wydarzeń
+                            String wydarzenieTytul = (String) dc.getDocument().getData().get("wydarzenieTytul");
+                            String wydarzenieData = (String) dc.getDocument().getData().get("wydarzenieData");
+                            float wydarzenieCena = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieCena"));
+                            String wydarzenieOpis = (String) dc.getDocument().getData().get("wydarzenieOpis");
+                            String wydarzenieRegulamin = (String) dc.getDocument().getData().get("wydarzenieRegulamin");
+                            float wydarzenieDystans = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieDystans"));
+                            float wydarzenieUczestnicyIlosc = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieUczestnicyIlosc"));
+                            boolean wydarzenieHistoria = Boolean.parseBoolean("" + dc.getDocument().getData().get("wydarzenieHistoria"));
 
-                //dodanie kolejnych wydarzeń
-                Wydarzenie wydarzenie = dataSnapshot.getValue(Wydarzenie.class);
-                adapter.add(wydarzenie);
-            } //działa gdy jest child dodany a za pierwszym razem dla każdego child czyli sam robi pentlę
+                            Wydarzenie wydarzenie = new Wydarzenie(wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
+                            adapter.add(wydarzenie);
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            } //działa gdy jest child zmieniony
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }  //działa gdy jest child usunięty
+                            Log.d(TAG, "onEvent: ________" + dc.getDocument().getData());
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                            break;
+                    }
+                }
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }  //działa gdy jest child przesuniety
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }  //działa gdy coś poszło nie tak np brak dostępu do db a chce sie coś zmienić
+            }
         });
-
 
         //onClick listener na listMain View
         listViewWydarzenia.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -167,9 +182,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     } //koniec onCreate_____________________________________________________________________
-
 
     // metoda sprawdzająca czy ktoś jest zalogowany i jak jest to jego imię zapisuje do dhared pref a jak nie to przenosi na stronę logowania
     private void logOrRegisterToFirebase(final int position) {
@@ -188,34 +201,54 @@ public class MainActivity extends AppCompatActivity {
                     String userEmail = user.getEmail();
                     userEmail = userEmail.replace(".", "").replace("#", "").replace("$", "").replace("[", "").replace("]", ""); //nazwa w firebse nie moze zawierać takiego znaku
 
-                    //pobranie danych z danego itema wydarzenia przekazane jest w metodzie z listViewWydarzenia.setOnItemClickListener
-                    Wydarzenie currentWydarzenie = listMain.get(position);
-                    String tytul = currentWydarzenie.getTytul();
-                    String miejsceICzas = currentWydarzenie.getMiejsceICzas();
-                    String opis = currentWydarzenie.getOpis();
-                    int cena = currentWydarzenie.getCena();
-
-                    //zapisanie wszystkich danych do shared pref
+                    // zapisanie imienia i emailu do shar pref
                     editor = shar.edit(); //wywołany edytor do zmian
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_TYTUL, tytul);
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_MIEJSCE_I_CZAS, miejsceICzas);
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_OPIS, opis);
-                    editor.putInt(TO_ACTIVITY_WYDARZENIE_CENA, cena);
                     editor.putString(TO_ACTIVITY_WYDARZENIE_USER_NAME, userName);
                     editor.putString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, userEmail);
                     editor.apply(); // musi być na końcu aby zapisać zmiany w shar
 
+                    // przejście do profilu uczestnika______________________________________________________________________________________________________________________________________
+                    if (position == -1) {
+
+                        //włączenie activity z profilem użytkownika
+                        startActivity(new Intent(MainActivity.this, UserActivity.class));
+                        return;
+                    }
+                    //______________________________________________________________________________________________________________________________________________________________________
+
+                    //przejście do wydarzenia danego - pobranie danych z danego itema wydarzenia przekazane jest w metodzie z listViewWydarzenia.setOnItemClickListener
+                    Wydarzenie currentWydarzenie = listMain.get(position);
+                    String wydarzenieTytul = currentWydarzenie.getWydarzenieTytul();
+                    String wydarzenieData = currentWydarzenie.getWydarzenieData();
+                    float wydarzenieCena = currentWydarzenie.getWydarzenieCena();
+                    String wydarzenieOpis = currentWydarzenie.getWydarzenieOpis();
+                    String wydarzenieRegulamin = currentWydarzenie.getWydarzenieRegulamin();
+                    float wydarzenieDystans = currentWydarzenie.getWydarzenieDystans();
+                    float wydarzenieUczestnicyIlosc = currentWydarzenie.getWydarzenieUczestnicyIlosc();
+                    boolean wydarzenieHistoria = currentWydarzenie.getWydarzenieHistoria();
+
+                    //zapisanie danych  o wydarzeniu do shared pref
+                    editor = shar.edit(); //wywołany edytor do zmian
+                    editor.putString(TO_ACTIVITY_WYDARZENIE_TYTUL, wydarzenieTytul);
+                    editor.putString(TO_ACTIVITY_WYDARZENIE_DATA, wydarzenieData);
+                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_CENA, wydarzenieCena);
+                    editor.putString(TO_ACTIVITY_WYDARZENIE_OPIS, wydarzenieOpis);
+                    editor.putString(TO_ACTIVITY_WYDARZENIE_REGULAMIN, wydarzenieRegulamin);
+                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_DYSTANS, wydarzenieDystans);
+                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_UCZESTNICY_ILOSC, wydarzenieUczestnicyIlosc);
+                    editor.putBoolean(TO_ACTIVITY_WYDARZENIE_HISTORIA, wydarzenieHistoria);
+                    editor.apply();
+
                     // otwarcie tego activity
                     Intent intent = new Intent(MainActivity.this, ActivityWydarzenie.class);
                     startActivity(intent);
-
 
                 } else {
 
                     // musi byc alert dialog bo inaczej jak ktoś kliknął onBackPressed to nie wracało do głównego activity a traz wraca
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("Logowanie");
-                    builder.setMessage("Aby dowiedzieć się więcej musisz być zalogowany poprzez konto Google.");
+                    builder.setMessage("Aby przejść dalej musisz być zalogowany poprzez konto Google.");
                     builder.setPositiveButton("Zaloguj", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -272,6 +305,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // wyłaczenie listenera
+        registration.remove();
+    }
 
     // do górnego menu
     @Override
@@ -280,7 +320,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_info:
                 startActivity(new Intent(MainActivity.this, ActivityInfo.class));
                 break;
-
+            case R.id.menu_user_profile:
+                logOrRegisterToFirebase(-1);
+                break;
+            // otwiera panel administratora, przycisk jest wyłaczony chyba że bedzie odpowiedni email - warynek jest w metodzie onCreateOptionsMenu
+            case R.id.menu_admin:
+                Intent intent = new Intent(MainActivity.this, ActivityAdmin.class);
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -289,9 +336,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main_layout, menu);
+
+        //ustawienie widoczności guzika dla admina
+        String emailAdmin = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, "");
+        if (emailAdmin.equals("damianpltf@gmailcom") || emailAdmin.equals("marekwichura1969@gmailcom")) {
+            MenuItem item = menu.findItem((R.id.menu_admin));
+            item.setVisible(true);
+        }
         return super.onCreateOptionsMenu(menu);
     }
-
 
     //musi być bo nie dziłało inaczej. Przenosiło do aplikacji poprzedniej a tera zamyka apke dobrze
     @Override

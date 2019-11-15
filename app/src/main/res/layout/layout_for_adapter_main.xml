@@ -23,7 +23,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="4dp">
 
             <ImageView
                 android:layout_width="20dp"
@@ -31,13 +31,63 @@
                 app:srcCompat="@drawable/calendar_transparent" />
 
             <TextView
-                android:id="@+id/textViewMiejsceICzas"
+                android:id="@+id/textViewData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
                 android:textSize="14sp"
-                tools:text="toolsTextCzas i data"
+                tools:text="tools data"
+                android:textColor="@color/colorPrimaryDarkBlue900"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:srcCompat="@drawable/distance_transparent" />
+
+            <TextView
+                android:id="@+id/textViewDystans"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                tools:text="tools dystans"
+                android:textColor="@color/colorPrimaryDarkBlue900"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:srcCompat="@drawable/people_transparent" />
+
+            <TextView
+                android:id="@+id/textViewUczestnicy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"
+                tools:text="tools uczestnicy ilość"
                 android:textColor="@color/colorPrimaryDarkBlue900"/>
 
         </LinearLayout>

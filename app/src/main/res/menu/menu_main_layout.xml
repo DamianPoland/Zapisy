@@ -2,6 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+    <item
+        android:id="@+id/menu_admin"
+        android:icon="@drawable/ic_build_white_24dp"
+        android:title="Admin"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_user_profile"
+        android:icon="@drawable/ic_person_white_24dp"
+        android:title="Profil uczetnika"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_info"
         android:title="Info"

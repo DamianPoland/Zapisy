@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackgroundGray200"
+    tools:context=".UserActivity">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/item_ripple_effect"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="8dp"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/textViewActivityUserOpis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Panel użytkownika"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="8dp">
+
+                    <TextView
+                        android:id="@+id/textViewUserEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Email:" />
+
+                    <TextView
+                        android:id="@+id/textViewUserNameAndSurname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Imię i nazwisko:" />
+
+                    <TextView
+                        android:id="@+id/textViewUserAdres"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Adres:" />
+
+                    <TextView
+                        android:id="@+id/textViewUserMiasto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Miasto:" />
+
+                    <TextView
+                        android:id="@+id/textViewUserKodPocztowy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Kod pocztowy:" />
+
+                    <TextView
+                        android:id="@+id/textViewUserNrTelefonu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:text="Nr telefonu:" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonUserZmienDane"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/item_ripple_for_button"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold"
+                    android:text="Zmień dane"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linLayUserEdycjaDanychUzytkownika"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/item_ripple_effect"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Edycja danych"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/editTextUserNameAndSurname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz Imię i nazwisko"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/editTextUserAdres"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz Adres"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/editTextUserMiasto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz Miasto"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/editTextUserKodPocztowy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz Kod pocztowy"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="14sp" />
+
+                    <EditText
+                        android:id="@+id/editTextUserNrTelefonu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz Nr telefonu"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonUserZapiszDane"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/item_ripple_for_button"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Zapisz dane"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

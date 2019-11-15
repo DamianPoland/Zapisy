@@ -17,11 +17,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-
-
-
-
             <LinearLayout
                 android:id="@+id/linLayTytyl"
                 android:layout_width="match_parent"
@@ -43,7 +38,7 @@
                     android:textAlignment="center"/>
 
                 <LinearLayout
-                    android:id="@+id/linearLiaoutMiejsceiCzas"
+                    android:id="@+id/linearLiaoutData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -56,13 +51,63 @@
                         android:layout_marginStart="16dp"/>
 
                     <TextView
-                        android:id="@+id/textViewActivityWydarzenieMiejsceICzas"
+                        android:id="@+id/textViewActivityWydarzenieData"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:textSize="14sp"
                         android:textStyle="italic"
-                        tools:text="TextView"
+                        tools:text="tools data"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLiaoutDystansOgolny"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:srcCompat="@drawable/distance_transparent"
+                        android:layout_marginStart="16dp"/>
+
+                    <TextView
+                        android:id="@+id/textViewActivityWydarzenieDystansOgolny"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        tools:text="tools dystans"
+                        android:paddingStart="16dp"
+                        android:textColor="@color/colorPrimaryDarkBlue900"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLiaoutUczestnicy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:srcCompat="@drawable/people_transparent"
+                        android:layout_marginStart="16dp"/>
+
+                    <TextView
+                        android:id="@+id/textViewActivityWydarzenieUczestnicy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        tools:text="tools uczestnicy ilosc"
                         android:paddingStart="16dp"
                         android:textColor="@color/colorPrimaryDarkBlue900"/>
                 </LinearLayout>

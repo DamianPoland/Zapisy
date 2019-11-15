@@ -111,11 +111,7 @@ public class ServiceWydarzenie extends Service implements LocationListener {
 
         // ustawienie locationMangera żeby słuchał
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 10, this); // minTime w ms (np 10000), minDistance w m np(10) - pozwolenie fine location otyczy GPS i NETWORK providers
-
-//        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){ // jeśli będzie sie wywalać  network location ale nie powinno
-//
-//        }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 20000,10,this); // dodane location przez sieć - pozwolenie coarse location
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 20000,10,this); // dodane location przez sieć - pozwolenie coarse location
     }
 
     //przy każdej zmianie czasu lub/i dystansu z locationManagera wywołuje tą metodę
