@@ -10,238 +10,52 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <LinearLayout
-            android:id="@+id/linearLayoutMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/item_ripple_effect"
-            android:elevation="8dp"
-            android:orientation="vertical"
-            android:padding="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/textViewActivityWydarzenieTytul"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Dodawanie/Edycja wydarzenia"
-                android:textAlignment="center"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            android:orientation="vertical">
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/item_ripple_effect"
+                android:elevation="8dp"
                 android:orientation="vertical"
-                android:paddingTop="8dp">
+                android:padding="8dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Tytuł:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="Dane wydarzenia:" />
 
-                <EditText
-                    android:id="@+id/editTextAdminTytul"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz tytuł"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Data:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminData"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz datę"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Cena:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminCena"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz cenę"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Opis:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminOpis"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz opis"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Regulamin:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminRegulamin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz regulamin"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Dystans:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminDystans"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz dystans"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Ilość uczestników:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminUczestnicyIlosc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz ilość uczestników"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="8dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:text="Historia:"
-                    android:textColor="@color/colorPrimaryDarkBlue900"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/editTextAdminHistoria"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wpisz true"
-                    android:textSize="18sp" />
 
             </LinearLayout>
 
 
             <LinearLayout
+                android:id="@+id/linLayAdminButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
+                android:layout_margin="16dp"
+                android:background="@drawable/item_ripple_effect"
+                android:elevation="8dp"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="8dp"
+                android:visibility="visible"
+                tools:visibility="visible">
 
 
                 <Button
                     android:id="@+id/buttonAdminPrzeniesDoHistorii"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="16dp"
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
@@ -253,18 +67,228 @@
                     android:id="@+id/buttonAdminUsun"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Usuń"
+                    android:text="Usuń całkowicie"
                     android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/buttonAdminEdytuje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/item_ripple_for_button"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Edytuj wydarzenie"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/buttonAdminWyniki"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/item_ripple_for_button"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Wyniki"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/linLayAdminEdycjaWydarzenia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/item_ripple_effect"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Tytuł:"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminTytul"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz tytuł"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Data:"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminData"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz datę np: 2020-05-19"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Cena (sama cyfra bez zł):"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminCena"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz cenę np: 3"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Opis:"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminOpis"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz opis"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Regulamin:"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminRegulamin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz regulamin"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Dystans (sama cyfra bez km):"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminDystans"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz dystans np: 12.5"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="Ilość uczestników (sama cyfra):"
+                        android:textColor="@color/colorPrimaryDarkBlue900"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/editTextAdminUczestnicyIlosc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Wpisz ilość uczestników"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/buttonAdminAktualizuj"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
+                    android:layout_marginTop="16dp"
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
@@ -275,6 +299,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

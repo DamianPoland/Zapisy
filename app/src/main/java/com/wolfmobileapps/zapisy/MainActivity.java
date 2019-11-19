@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     //stałe do przeniesienia do activity wydarzenie
+    public static final String TO_ACTIVITY_WYDARZENIE_NAZWA_COLLECTION = "to activity wydarzenie nazwa collection";
     public static final String TO_ACTIVITY_WYDARZENIE_TYTUL = "to activity wydarzenie tytul";
     public static final String TO_ACTIVITY_WYDARZENIE_DATA = "to activity wydarzenie miejsceICzas";
     public static final String TO_ACTIVITY_WYDARZENIE_CENA = "to activity wydarzenie cena";
@@ -51,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
     public static final String TO_ACTIVITY_WYDARZENIE_HISTORIA = "to activity wydarzenie historia";
     public static final String TO_ACTIVITY_WYDARZENIE_USER_NAME = "to activity wydarzenie user name";
     public static final String TO_ACTIVITY_WYDARZENIE_USER_EMAIL = "to activity wydarzenie user email";
+
+    // stałe do firebase
+    public static final String COLLECTION_NAME_WYDARZENIE = "Wydarzenia";
+    public static final String COLLECTION_NAME_USERS = "Users";
+    public static final String COLLECTION_NAME_STARTY = "Starty";
+    public static final String COLLECTION_NAME_UCZESTNICY = "Uczestnicy";
 
     //stałe inne
     public static final String SHARED_PREFERENCES_NAME = "zapisy shared preferences";
@@ -65,14 +72,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewWydarzenia;
     private ProgressBar progressBarWaiForFirebase;
 
-
     //do Firebase Database
     private FirebaseFirestore db;
-    public static final String COLLECTION_NAME_WYDARZENIE = "Wydarzenia";
-    public static final String COLLECTION_NAME_USERS = "Users";
     private ListenerRegistration registration;
-
-
 
     // do Firebase Authetication
     private FirebaseAuth mFirebaseAuth;
@@ -127,6 +129,23 @@ public class MainActivity extends AppCompatActivity {
         adapter = new WydarzeniaArrayAdapter(this, 0, listMain);
         listViewWydarzenia.setAdapter(adapter);
 
+        //onClick listener na listMain View
+        listViewWydarzenia.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // metoda do logowania
+                logOrRegisterToFirebase(position);
+            }
+        });
+
+    } //koniec onCreate_____________________________________________________________________
+
+
+    // metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
+    private void addListenerToFirebaseWydarzenia (){
+        adapter.clear(); // wyczyszczenie adaptera przed dodaniem od nowa listenera
+
         //słucha wszystkiego cosię dzieje wdanym folderze tu "Wydarzenia", odpala się za każdym razem
         CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE);
         registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -141,10 +160,11 @@ public class MainActivity extends AppCompatActivity {
                     switch (dc.getType()) {
                         case ADDED:
                             Log.d(TAG, "New city: " + dc.getDocument().getData());
-                            //                // wyłączenie progress bara
+                            //wyłączenie progress bara
                             progressBarWaiForFirebase.setVisibility(View.GONE);
 
                             //dodanie kolejnych wydarzeń
+                            String wydarzenieNazwaCollection = (String) dc.getDocument().getData().get("wydarzenieNazwaCollection");
                             String wydarzenieTytul = (String) dc.getDocument().getData().get("wydarzenieTytul");
                             String wydarzenieData = (String) dc.getDocument().getData().get("wydarzenieData");
                             float wydarzenieCena = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieCena"));
@@ -154,9 +174,12 @@ public class MainActivity extends AppCompatActivity {
                             float wydarzenieUczestnicyIlosc = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieUczestnicyIlosc"));
                             boolean wydarzenieHistoria = Boolean.parseBoolean("" + dc.getDocument().getData().get("wydarzenieHistoria"));
 
-                            Wydarzenie wydarzenie = new Wydarzenie(wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
-                            adapter.add(wydarzenie);
+                            Wydarzenie wydarzenie = new Wydarzenie(wydarzenieNazwaCollection, wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
 
+                            // wydarzenie zostanie dodane do adaptera tylko jeśli NIE będzie w historii
+                            if (!wydarzenieHistoria){
+                                adapter.add(wydarzenie);
+                            }
 
                             Log.d(TAG, "onEvent: ________" + dc.getDocument().getData());
                             break;
@@ -171,18 +194,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-        //onClick listener na listMain View
-        listViewWydarzenia.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // metoda do logowania
-                logOrRegisterToFirebase(position);
-            }
-        });
-
-    } //koniec onCreate_____________________________________________________________________
+    }
 
     // metoda sprawdzająca czy ktoś jest zalogowany i jak jest to jego imię zapisuje do dhared pref a jak nie to przenosi na stronę logowania
     private void logOrRegisterToFirebase(final int position) {
@@ -216,28 +228,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     //______________________________________________________________________________________________________________________________________________________________________
 
-                    //przejście do wydarzenia danego - pobranie danych z danego itema wydarzenia przekazane jest w metodzie z listViewWydarzenia.setOnItemClickListener
-                    Wydarzenie currentWydarzenie = listMain.get(position);
-                    String wydarzenieTytul = currentWydarzenie.getWydarzenieTytul();
-                    String wydarzenieData = currentWydarzenie.getWydarzenieData();
-                    float wydarzenieCena = currentWydarzenie.getWydarzenieCena();
-                    String wydarzenieOpis = currentWydarzenie.getWydarzenieOpis();
-                    String wydarzenieRegulamin = currentWydarzenie.getWydarzenieRegulamin();
-                    float wydarzenieDystans = currentWydarzenie.getWydarzenieDystans();
-                    float wydarzenieUczestnicyIlosc = currentWydarzenie.getWydarzenieUczestnicyIlosc();
-                    boolean wydarzenieHistoria = currentWydarzenie.getWydarzenieHistoria();
-
-                    //zapisanie danych  o wydarzeniu do shared pref
-                    editor = shar.edit(); //wywołany edytor do zmian
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_TYTUL, wydarzenieTytul);
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_DATA, wydarzenieData);
-                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_CENA, wydarzenieCena);
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_OPIS, wydarzenieOpis);
-                    editor.putString(TO_ACTIVITY_WYDARZENIE_REGULAMIN, wydarzenieRegulamin);
-                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_DYSTANS, wydarzenieDystans);
-                    editor.putFloat(TO_ACTIVITY_WYDARZENIE_UCZESTNICY_ILOSC, wydarzenieUczestnicyIlosc);
-                    editor.putBoolean(TO_ACTIVITY_WYDARZENIE_HISTORIA, wydarzenieHistoria);
-                    editor.apply();
+                    // Do otwarcia next activity z list view - pobranie danych z danego itema wydarzenia i zapisanie danych  o wydarzeniu do shared pref
+                    Wydarzenie wydarzenie = new Wydarzenie();
+                    wydarzenie.saveDataInSharedPref(MainActivity.this, listMain, position);
 
                     // otwarcie tego activity
                     Intent intent = new Intent(MainActivity.this, ActivityWydarzenie.class);
@@ -285,8 +278,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+
+        //metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
+        addListenerToFirebaseWydarzenia();
 
         // do właczenia listenera logowania
         if (mFirebaseAuth != null) {
@@ -296,8 +292,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
+
+        // wyłaczenie listenera
+        registration.remove();
 
         // do wyłaczenia listenera logowania
         if (mFirebaseAuth != null) {
@@ -305,13 +304,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
-        // wyłaczenie listenera
-        registration.remove();
-    }
 
     // do górnego menu
     @Override

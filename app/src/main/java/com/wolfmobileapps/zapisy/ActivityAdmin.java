@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +29,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_WYDARZENIE;
+import static com.wolfmobileapps.zapisy.MainActivity.SHARED_PREFERENCES_NAME;
+
 
 public class ActivityAdmin extends AppCompatActivity {
     private static final String TAG = "ActivityAdmin";
@@ -36,6 +39,9 @@ public class ActivityAdmin extends AppCompatActivity {
     //views
     ProgressBar progressBarWaiForFirebaseAdmin;
 
+    // do Shared Preferences
+    private SharedPreferences shar;
+    private SharedPreferences.Editor editor;
 
     //do Firebase Database
     private FirebaseFirestore db;
@@ -55,30 +61,38 @@ public class ActivityAdmin extends AppCompatActivity {
         progressBarWaiForFirebaseAdmin= findViewById(R.id.progressBarWaiForFirebaseAdmin);
         listViewWydarzeniaAdmin = findViewById(R.id.listViewWydarzeniaAdmin);
 
+        // do Shared Prefereneces instancja
+        shar = getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+
         // do Firebase instancja Database
         db = FirebaseFirestore.getInstance();
-
-
-        // przykładowe wydarzenie
-//        Wydarzenie wyd1 = new Wydarzenie("Czwartki Bojanie - jesień 2019, konkurs 5", "2019-10-12", 0, "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)", "Przyklądowy regulamin", 12, 180, false);
-//        Wydarzenie wyd2 = new Wydarzenie("Przyjaźń - Małe Kaszuby Biegają 2019", "2019-09-12", 0, "Zapraszamy do udziału w II Paradzie Rowerowej w ramach VI Festiwalu Zdrowia! To krótki, 10-kilometrowy przejazd dla całych rodzin! Trasa wiedzie przez Przyjaźń 2007)", "Przyklądowy regulamin", 50, 810, false);
-//        Wydarzenie wyd3 = new Wydarzenie("II Kaszubska Prada Rowerowa\", \"2019-10-12 10:50 Przyjaźń ", "2019-10-11", 0, "Opłać swój udział i wystartuj w całym cyklu Kaszuby Biegają 2019", "Przyklądowy regulamin", 56.5f, 80, false);
-//        Wydarzenie wyd4 = new Wydarzenie("VII Bieg Przyjaźni\", \"2019-10-12 11:00 Przyjaźń k. Żukowa", "2018-10-12", 1, "15 km, 10 km, 5 km, 21 km i 1,6 km na zakończenie. Weź udział w Biegowej Imprezie Marzeń! Zwolnij i odpocznij we Wdzydzach na Kaszubach od 12 ", "Przyklądowy regulamin", 15, 90, false);
-//        Wydarzenie wyd5 = new Wydarzenie("Marsz Nordic Walking - Festiwal Zdrowia", "2019-01-12", 1.50f, "Zawody w 3 kategoriach wiekowych:\n11 lat i młodsi (rocznik 2009), 12 lat (rocznik 2008), 13 lat (rocznik 2007)", "Przyklądowy regulamin", 22, 550, false);
-//        Wydarzenie wyd6 = new Wydarzenie("Hard Runner - IV Festiwal Biegów Polski Północnej", "2019-10-14", 0, "awodów, szatnie: Przyjaźń, ul. Szkolna 2, czynne od godz. 08:30\nStart i Meta: Przyjaźń, ul. Szkolna 2", "Przyklądowy regulamin", 7, 280, false);
-
-        //dodanie wydarzenia do firestore
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd1.getWydarzenieTytul(), wyd1);
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd2.getWydarzenieTytul(), wyd2);
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd3.getWydarzenieTytul(), wyd3);
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd4.getWydarzenieTytul(), wyd4);
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd5.getWydarzenieTytul(), wyd5);
-//        addDataToFirestore(COLLECTION_NAME_WYDARZENIE, wyd6.getWydarzenieTytul(), wyd6);
 
         //wyświetlenie w listView z Firebas
         listMain = new ArrayList<>();
         adapter = new WydarzeniaArrayAdapter(this, 0, listMain);
         listViewWydarzeniaAdmin.setAdapter(adapter);
+
+        //onClick listener na listMain View
+        listViewWydarzeniaAdmin.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // Do otwarcia next activity z list view - pobranie danych z danego itema wydarzenia i zapisanie danych  o wydarzeniu do shared pref
+                Wydarzenie wydarzenie = new Wydarzenie();
+                wydarzenie.saveDataInSharedPref(ActivityAdmin.this, listMain, position);
+
+                // otwarcie tego activity i wskazanie że to edycja a nie nowy
+                Intent intent = new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class);
+                intent.putExtra("edycja", true);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    // metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
+    private void addListenerToFirebaseWydarzenia () {
+        adapter.clear(); // wyczyszczenie adaptera przed dodaniem od nowa listenera
 
         //słucha wszystkiego cosię dzieje wdanym folderze tu "Wydarzenia", odpala się za każdym razem
         CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE);
@@ -98,6 +112,7 @@ public class ActivityAdmin extends AppCompatActivity {
                             progressBarWaiForFirebaseAdmin.setVisibility(View.GONE);
 
                             //dodanie kolejnych wydarzeń
+                            String wydarzenieNazwaCollection = (String) dc.getDocument().getData().get("wydarzenieNazwaCollection");
                             String wydarzenieTytul = (String) dc.getDocument().getData().get("wydarzenieTytul");
                             String wydarzenieData = (String) dc.getDocument().getData().get("wydarzenieData");
                             float wydarzenieCena = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieCena"));
@@ -107,9 +122,8 @@ public class ActivityAdmin extends AppCompatActivity {
                             float wydarzenieUczestnicyIlosc = Float.parseFloat("" + dc.getDocument().getData().get("wydarzenieUczestnicyIlosc"));
                             boolean wydarzenieHistoria = Boolean.parseBoolean("" + dc.getDocument().getData().get("wydarzenieHistoria"));
 
-                            Wydarzenie wydarzenie = new Wydarzenie(wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
+                            Wydarzenie wydarzenie = new Wydarzenie(wydarzenieNazwaCollection, wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
                             adapter.add(wydarzenie);
-
 
                             Log.d(TAG, "onEvent: ________" + dc.getDocument().getData());
                             break;
@@ -124,37 +138,22 @@ public class ActivityAdmin extends AppCompatActivity {
 
             }
         });
-
-        //onClick listener na listMain View
-        listViewWydarzeniaAdmin.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Intent intent = new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class);
-                startActivity(intent);
-            }
-        });
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-    // dodawanie wydarzenia do firestore
-    public void addDataToFirestore(String nameWydarzenieCollection, String documentKey, Wydarzenie objectWyd) {
-        // dodawanie wydarzenia
-        db.collection(nameWydarzenieCollection).document(documentKey) // key bedzie exampleKey
-                .set(objectWyd) // wyd1 to obiekt który ma być dodany
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(ActivityAdmin.this, "Wydarzenie dodane", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ActivityAdmin.this, "Error - wydarzenie nie dodane", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        //metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
+        addListenerToFirebaseWydarzenia();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // wyłaczenie listenera
+        registration.remove();
     }
 
     // do górnego menu
@@ -162,7 +161,9 @@ public class ActivityAdmin extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_dodaj:
-                startActivity(new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class));
+                Intent intent = new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class);
+                intent.putExtra("nowy", true);
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);

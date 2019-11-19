@@ -238,13 +238,6 @@
             </LinearLayout>
 
 
-
-
-
-
-
-
-
             <LinearLayout
                 android:id="@+id/linLayNagrajTrasę"
                 android:layout_width="match_parent"
@@ -278,6 +271,20 @@
                     android:layout_marginTop="8dp"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/item_selector" />
+
+                <Button
+                    android:id="@+id/buttonWyniki"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/item_ripple_for_button"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Wyniki"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
             </LinearLayout>
 

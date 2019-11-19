@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -31,40 +30,26 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.wallet.AutoResolveHelper;
-import com.google.android.gms.wallet.IsReadyToPayRequest;
-import com.google.android.gms.wallet.PaymentData;
-import com.google.android.gms.wallet.PaymentDataRequest;
-import com.google.android.gms.wallet.PaymentsClient;
-import com.google.android.gms.wallet.Wallet;
-import com.google.android.gms.wallet.WalletConstants;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.annotations.Nullable;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 
+import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_STARTY;
+import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_UCZESTNICY;
+import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_USERS;
+import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_WYDARZENIE;
 import static com.wolfmobileapps.zapisy.MainActivity.SHARED_PREFERENCES_NAME;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_CENA;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_DATA;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_DYSTANS;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_HISTORIA;
+import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_NAZWA_COLLECTION;
+
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_OPIS;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_REGULAMIN;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_TYTUL;
@@ -116,10 +101,12 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private LinearLayout linLayZgloszonaTrasa;
     private LinearLayout linLayNagrajTrasę;
     private LinearLayout linLayNagranaTrasa;
+    private Button buttonWyniki;
 
     //do Firebase Database
-    FirebaseFirestore db;
-    private String dbNameCollection;
+    private FirebaseFirestore db;
+    private ListenerRegistration registration;
+
 
     // do Shared Preferences
     private SharedPreferences shar;
@@ -132,6 +119,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
     // dane pobrane z Intent
     private String tytul;
+    private String dbNameCollection;
     private String data;
     private float cena;
     private String opis;
@@ -165,8 +153,8 @@ public class ActivityWydarzenie extends AppCompatActivity {
         shar = getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
         // pobranie danych z shared pref
+        dbNameCollection = shar.getString(TO_ACTIVITY_WYDARZENIE_NAZWA_COLLECTION, "Error");
         tytul = shar.getString(TO_ACTIVITY_WYDARZENIE_TYTUL, "Tytuł");
-        dbNameCollection = tytul; // nazwakolekcji będzie takajak tytuł wydarzenia
         data = shar.getString(TO_ACTIVITY_WYDARZENIE_DATA, "Data");
         cena = shar.getFloat(TO_ACTIVITY_WYDARZENIE_CENA, 0);
         opis = shar.getString(TO_ACTIVITY_WYDARZENIE_OPIS, "opis");
@@ -202,12 +190,13 @@ public class ActivityWydarzenie extends AppCompatActivity {
         linLayZgloszonaTrasa = findViewById(R.id.linLayZgloszonaTrasa);
         linLayNagrajTrasę = findViewById(R.id.linLayNagrajTrasę);
         linLayNagranaTrasa = findViewById(R.id.lanLayNagranaTrasa);
+        buttonWyniki = findViewById(R.id.buttonWyniki);
 
         //ustawienie tekstów
         textViewActivityWydarzenieTytul.setText(tytul);
         textViewActivityWydarzenieData.setText("Data: "+ data);
         textViewActivityWydarzenieDystansOgolny.setText("Dystans: " +dystans + " km");
-        textViewActivityWydarzenieUczestnicy.setText("Uczestnicy: " + uczestnicyIlosc);
+        textViewActivityWydarzenieUczestnicy.setText("Uczestnicy: " + Math.round(uczestnicyIlosc));
         textViewActivityWydarzenieOpis.setText(opis);
         textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
 
@@ -231,11 +220,15 @@ public class ActivityWydarzenie extends AppCompatActivity {
             textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE);
         }
 
+        // jeśli wydarzenie jest w historii to ukryje przycisk nagrai i opis i pokaże przycisk wyniki
+        if (historia) {
+            buttonWyniki.setVisibility(View.VISIBLE);
+            imageViewStartStop.setVisibility(View.GONE);
+            textViewNagrajTrase.setVisibility(View.GONE);
+        }
+
         // ustawienie wyników z servisu w textViews
         setViewsFromServiseOncore();
-
-
-
 
         // do Firebase instancja Database
         db = FirebaseFirestore.getInstance();
@@ -245,30 +238,6 @@ public class ActivityWydarzenie extends AppCompatActivity {
         animationDown.setDuration(1000);
         animationUp = AnimationUtils.loadAnimation(ActivityWydarzenie.this, R.anim.anim_rotation_up);
         animationUp.setDuration(1000);
-
-        // słucha zmian na serwerze - ukrywa przycisk dołacz jak jest wysłane coś na serwer pod child user Email
-        final DocumentReference docRef = db.collection(dbNameCollection).document(userEmail);
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-                if (snapshot != null && snapshot.exists()) { // włącza za każdym razem jak zrobi nowy lub zaktualizuje
-                    Log.d(TAG, "Current data: " + snapshot.getData());
-
-                    // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
-                    changeViewsVisibilityAfterAddOrChangeChild(snapshot);
-
-                    // pobranie danych o zapisanej trasie z Firebase i wstawienie do textViewsFirebase
-                    getDataFromFirebaseAndShowOnTextViews(snapshot);
-                } else {
-                    Log.d(TAG, "Current data: null");
-                }
-            }
-        });
 
         // przycisk dołącz
         buttonDolacz.setOnClickListener(new View.OnClickListener() {
@@ -359,6 +328,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
             public void onClick(View v) {
 
                 // pobranie danych z shar Pref
+                String userName = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "User");
                 float distance = shar.getFloat(KEY_DISTANCE, 0);
                 String fullTime = shar.getString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME);
                 float speed = shar.getFloat(KEY_SPEED, 0);
@@ -369,8 +339,10 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     return;
                 }
 
-                //wysłanie danych naserwer
-                sentDataToFirebase(distance, fullTime, speed, mapPoints);
+                //wysłanie danych na serwer
+                DaneTrasy daneTrasy = new DaneTrasy(userEmail,distance,fullTime,speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
+                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE,dbNameCollection,COLLECTION_NAME_UCZESTNICY,userEmail); // wysłanie do collection Wydarzenia
+                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS,userEmail,COLLECTION_NAME_STARTY,dbNameCollection); // wysłąnie do collection Users
 
                 // ustawienie wisibility linLay do nagranej trasy
                 editor = shar.edit(); //wywołany edytor do zmian
@@ -448,6 +420,17 @@ public class ActivityWydarzenie extends AppCompatActivity {
             }
         });
 
+        // przycisk do wyników
+        buttonWyniki.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // przenosi do wyników danego wydarzenia - wszystkie dane są już zapisane w shar pref przy wcześniejszym przejsciu z listView do tego activity
+                Intent intentWydarzenie = new Intent(ActivityWydarzenie.this, ActivityWyniki.class);
+                startActivity(intentWydarzenie);
+            }
+        });
+
 
         // broadcast reciver od servisu żeby upgradował text Views
         IntentFilter filter = new IntentFilter();
@@ -483,10 +466,32 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
 
 
+    // metoda dodaje listenera i słucha wszystkiego cosię dzieje w zapisie trasy w wydarzenia
+    private void addListenerToFirebaseWydarzeniaDanaTrasa () {
+        // słucha zmian na serwerze - ukrywa przycisk dołacz jak jest wysłane coś na serwer pod child user Email
+        final DocumentReference docRef = db.collection(COLLECTION_NAME_WYDARZENIE).document(dbNameCollection).collection(COLLECTION_NAME_UCZESTNICY).document(userEmail);
+        registration = docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+                if (snapshot != null && snapshot.exists()) { // włącza za każdym razem jak zrobi nowy lub zaktualizuje
+                    Log.d(TAG, "Current data: " + snapshot.getData());
 
+                    // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
+                    changeViewsVisibilityAfterAddOrChangeChild(snapshot);
 
-
-
+                    // pobranie danych o zapisanej trasie z Firebase i wstawienie do textViewsFirebase
+                    getDataFromFirebaseAndShowOnTextViews(snapshot);
+                } else {
+                    Log.d(TAG, "Current data: null");
+                }
+            }
+        });
+    }
 
     // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
     private void changeViewsVisibilityAfterAddOrChangeChild(DocumentSnapshot snapshot){
@@ -544,13 +549,16 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private void joinToEvent() {
 
         //ustawienie zerowych danych
+        String userName = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "User");
         float distance = 0;
         String fullTime = DEF_VALUE_TO_SET_FULL_TIME;
         float speed = 0;
         String mapPoints = "";
 
         //wysłanie uczestnictwa naserwer
-        sentDataToFirebase(distance, fullTime, speed, mapPoints);
+        DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance,fullTime,speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
+        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE,dbNameCollection,COLLECTION_NAME_UCZESTNICY,userEmail); // wysłanie do collection Wydarzenia
+        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS,userEmail,COLLECTION_NAME_STARTY,dbNameCollection); // wysłąnie do collection Users
         Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dołączenie do wydarzenia", Toast.LENGTH_SHORT).show();
     }
 
@@ -570,34 +578,6 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
         //ustawienie danych w textView z Firebase
         setDataInViewsFIREBASE(distanceFIREBASE, fullTimeFIREBASE, speedFIREBASE);
-    }
-
-    //wysłanie uczestnictwa lub danych naserwer
-    private void sentDataToFirebase(float distance, String fullTime, float speed, String mapPoints) {
-
-        //utworzenie obiektu daneTrasy aby wysłąć do Firebase
-        DaneTrasy daneTrasy = new DaneTrasy(distance, fullTime, speed, mapPoints);
-
-        //wpisanie do Firebase uczestnictwa i odrazu trasy z zerowymi danymi lub ostatnimi
-        db.collection(dbNameCollection).document(userEmail) // key bedzie exampleKey
-                .set(daneTrasy) // wyd1 to obiekt który ma być dodany
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document", e);
-                    }
-                });
-
-        //jeśli będzie zero to znaczy że było tylko dołączenie a nie dodanie trasy więc nie wyświetli komunikatu
-        if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
-            Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dodanie trasy", Toast.LENGTH_SHORT).show();
-        }
     }
 
     // ustawienie wyników z servisu w textViews
@@ -677,6 +657,22 @@ public class ActivityWydarzenie extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(updateUIReciver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
+        addListenerToFirebaseWydarzeniaDanaTrasa();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // wyłaczenie listenera
+        registration.remove();
     }
 
     // do górnego menu

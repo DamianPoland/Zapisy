@@ -9,8 +9,10 @@
 
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
 
         <LinearLayout
@@ -42,56 +44,56 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="8dp">
+                    android:layout_margin="8dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/textViewUserEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Email: "
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Email:" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textViewUserNameAndSurname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Imię i Nazwisko:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Imię i nazwisko:" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textViewUserAdres"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Adres:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Adres:" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textViewUserMiasto"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Miasto:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Miasto:" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textViewUserKodPocztowy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Kod pocztowy:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Kod pocztowy:" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/textViewUserNrTelefonu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
+                        android:text="Nr telefonu:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
-                        android:text="Nr telefonu:" />
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -101,11 +103,11 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/item_ripple_for_button"
-                    android:textColor="@color/colorWhite"
-                    android:textStyle="bold"
-                    android:text="Zmień dane"
                     android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
+                    android:paddingEnd="16dp"
+                    android:text="Zmień dane"
+                    android:textColor="@color/colorWhite"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
@@ -195,11 +197,35 @@
             </LinearLayout>
 
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:text="Wydarzenia do których dołączyłeś:"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
+            <ProgressBar
+                android:id="@+id/progressBarWaiForFirebaseUser"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp" />
+
+            <ListView
+                android:id="@+id/listViewWydarzeniaUser"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@color/colorBackgroundGray200"
+                android:dividerHeight="0dp" />
 
         </LinearLayout>
-
     </ScrollView>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
