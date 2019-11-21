@@ -51,11 +51,28 @@ public class DaneTrasy {
                         Log.w(TAG, "Error writing document", e);
                     }
                 });
+    }
 
-        //jeśli będzie zero to znaczy że było tylko dołączenie a nie dodanie trasy więc nie wyświetli komunikatu
-        if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
-            Toast.makeText(context, "Dziękujemy za dodanie trasy", Toast.LENGTH_SHORT).show();
-        }
+    // usuwanie wyniku z bazy przez admina gdy ktoś oszukiwał
+    public void deleteDataDataFirebase(Context context, String collectionMain, String documentMain, String collectionUser, String documentUser) {
+
+        FirebaseFirestore db;
+        db = FirebaseFirestore.getInstance();
+        //wpisanie do Firebase uczestnictwa i odrazu trasy z zerowymi danymi lub ostatnimi
+        db.collection(collectionMain).document(documentMain).collection(collectionUser).document(documentUser)
+                .delete() // usuwa document
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
     }
 
     public DaneTrasy() {

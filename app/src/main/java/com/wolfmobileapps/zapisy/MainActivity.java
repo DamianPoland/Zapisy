@@ -61,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
     //stałe inne
     public static final String SHARED_PREFERENCES_NAME = "zapisy shared preferences";
+    public static final String KEY_MAP_POINTS_TO_INTENT_OPEN_MAP_LIST = "key map points to intent open map LISTA";
+    public static final String KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_MAP_POINTS = "key to intent open map life data string WITH MAP POINTS";
+    public static final String KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_DISTANCE = "key to intent open map life data string WITH DISTANCE";
+    public static final String KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_TIME = "key to intent open map life data string WITH TIME";
+
+
 
     // do Shared Preferences
     private SharedPreferences shar;
@@ -85,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
     private ListView listViewWydarzenia;
     private ArrayList<Wydarzenie> listMain;
     private WydarzeniaArrayAdapter adapter;
+
+    public static final String[] TABLE_OF_ADMINS = {"damianpltf@gmailcom", "marekwichura1969@gmailcom", "wolfmobileapps@gmailcom", "miotkseba@gmailcom"}; // admin z dostępem do panelu admina - musi być 4!
+
 
 
     @Override
@@ -144,7 +153,14 @@ public class MainActivity extends AppCompatActivity {
 
     // metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
     private void addListenerToFirebaseWydarzenia (){
-        adapter.clear(); // wyczyszczenie adaptera przed dodaniem od nowa listenera
+
+        // wyczyszczenie adaptera przed dodaniem od nowego listenera
+        adapter.clear();
+
+        // wyłaczenie listenera jeśli już jest odpalony - inaczej działają dwa na raaz i sei d ublują
+        if (registration != null){
+            registration.remove();
+        }
 
         //słucha wszystkiego cosię dzieje wdanym folderze tu "Wydarzenia", odpala się za każdym razem
         CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE);
@@ -163,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                             //wyłączenie progress bara
                             progressBarWaiForFirebase.setVisibility(View.GONE);
 
-                            //dodanie kolejnych wydarzeń
+                            //dodanie nowego wydarzenia do adaptera
                             String wydarzenieNazwaCollection = (String) dc.getDocument().getData().get("wydarzenieNazwaCollection");
                             String wydarzenieTytul = (String) dc.getDocument().getData().get("wydarzenieTytul");
                             String wydarzenieData = (String) dc.getDocument().getData().get("wydarzenieData");
@@ -179,12 +195,16 @@ public class MainActivity extends AppCompatActivity {
                             // wydarzenie zostanie dodane do adaptera tylko jeśli NIE będzie w historii
                             if (!wydarzenieHistoria){
                                 adapter.add(wydarzenie);
+
                             }
 
                             Log.d(TAG, "onEvent: ________" + dc.getDocument().getData());
                             break;
                         case MODIFIED:
                             Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+
+                            // jeśli jest zrobiona modyfikacja jakiegos wydarzenia to przeładuje całość - inaczej wydarzenia się dodają a nie zmienaiją
+                            addListenerToFirebaseWydarzenia();
                             break;
                         case REMOVED:
                             Log.d(TAG, "Removed city: " + dc.getDocument().getData());
@@ -269,7 +289,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }).create();
                     builder.show();
-
                 }
             }
         };
@@ -306,6 +325,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     // do górnego menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -332,10 +353,11 @@ public class MainActivity extends AppCompatActivity {
 
         //ustawienie widoczności guzika dla admina
         String emailAdmin = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, "");
-        if (emailAdmin.equals("damianpltf@gmailcom") || emailAdmin.equals("marekwichura1969@gmailcom")) {
+        if (emailAdmin.equals(TABLE_OF_ADMINS[0]) || emailAdmin.equals(TABLE_OF_ADMINS[1]) || emailAdmin.equals(TABLE_OF_ADMINS[2]) || emailAdmin.equals(TABLE_OF_ADMINS[3])) {
             MenuItem item = menu.findItem((R.id.menu_admin));
             item.setVisible(true);
         }
+
         return super.onCreateOptionsMenu(menu);
     }
 

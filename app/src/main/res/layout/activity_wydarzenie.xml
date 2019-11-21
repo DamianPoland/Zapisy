@@ -261,16 +261,29 @@
                     android:textSize="16sp"
                     android:layout_gravity="center_horizontal"/>
 
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal">
 
-                <ImageView
-                    android:id="@+id/imageViewStartStop"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:text="Start"
-                    app:srcCompat="@drawable/start_button_transparent"
-                    android:layout_marginTop="8dp"
-                    android:layout_gravity="center_horizontal"
-                    android:background="@drawable/item_selector" />
+                    <ImageView
+                        android:id="@+id/imageViewStartStop"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        app:srcCompat="@drawable/start_button_transparent"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/item_selector" />
+
+                    <ImageView
+                        android:id="@+id/imageViewMapaLifeData"
+                        android:layout_width="80dp"
+                        android:layout_height="60dp"
+                        app:srcCompat="@drawable/map_button_description_transparent"
+                        android:background="@drawable/item_selector"
+                        android:layout_margin="8dp"
+                        android:elevation="8dp"/>
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/buttonWyniki"
@@ -299,7 +312,7 @@
 
 
             <LinearLayout
-                android:id="@+id/lanLayNagranaTrasa"
+                android:id="@+id/linLayNagranaTrasa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"

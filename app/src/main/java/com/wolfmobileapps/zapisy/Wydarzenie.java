@@ -11,8 +11,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.wolfmobileapps.zapisy.MainActivity.SHARED_PREFERENCES_NAME;
@@ -140,8 +138,6 @@ public class Wydarzenie {
                     public void onSuccess(Void aVoid) {
                         if (objectWyd.getWydarzenieHistoria() == true){
                             Toast.makeText(context, "Wydarzenie przeniesione do historii", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(context, "Wydarzenie dodane", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })

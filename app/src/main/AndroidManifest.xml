@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ActivityWyniki"></activity>
+        <activity android:name=".ActivityAdminListUsers"></activity>
+        <activity android:name=".ActivityWyniki" />
         <activity android:name=".ActivityAdminAddEditWydarzenie" />
         <activity android:name=".ActivityAdmin" />
         <activity android:name=".UserActivity" />

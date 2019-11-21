@@ -17,6 +17,7 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
@@ -28,7 +29,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.wolfmobileapps.zapisy.MainActivity.KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_DISTANCE;
+import static com.wolfmobileapps.zapisy.MainActivity.KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_MAP_POINTS;
+import static com.wolfmobileapps.zapisy.MainActivity.KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_TIME;
 import static com.wolfmobileapps.zapisy.MainActivity.SHARED_PREFERENCES_NAME;
+import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_DYSTANS;
 
 public class ServiceWydarzenie extends Service implements LocationListener {
 
@@ -69,6 +74,7 @@ public class ServiceWydarzenie extends Service implements LocationListener {
 
 
 
+
     // właczenie servisu
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -97,8 +103,7 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         return START_STICKY;
     }
 
-
-
+    // instancja locationManagera
     private void instantionOfLocationManager(Context context) {
 
         // instancja locationManagera
@@ -110,12 +115,11 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         }
 
         // ustawienie locationMangera żeby słuchał
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 10, this); // minTime w ms (np 10000), minDistance w m np(10) - pozwolenie fine location otyczy GPS i NETWORK providers
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, this); // minTime w ms (np 10000), minDistance w m np(10) - pozwolenie fine location otyczy GPS i NETWORK providers
         //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 20000,10,this); // dodane location przez sieć - pozwolenie coarse location
     }
 
     //przy każdej zmianie czasu lub/i dystansu z locationManagera wywołuje tą metodę
-
     @Override
     public void onLocationChanged(Location location) {
 
@@ -125,7 +129,43 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         LatLng latLngItem = new LatLng(lat,lng);
         listLatLng.add(latLngItem);
         Log.d(TAG, "onLocationChanged: lat: " + lat + ", lng: " + lng);
+
+        // obliczenie długości trasy
+        float distance = (float) SphericalUtil.computeLength(listLatLng); // zwraca dystans w metrach
+        float distanceInKm = distance / 1000; // zamian metrów na kilometry
+        float distanceOfEvent = shar.getFloat(TO_ACTIVITY_WYDARZENIE_DYSTANS, 0.0f);
+        Log.d(TAG, "onLocationChanged: dist in km : " + distanceInKm);
+
+        // wyłączenie servisu samoczynne jeśli osiągnie daną odległość, gdy servis się wyłaczy to odpala się metoda onDestroy servisu i ona updatuje przez broadcasta Activity wydarzenie
+        if (distanceInKm > distanceOfEvent){
+            // wyłączenie servisu
+            stopForeground(true);
+            stopSelf();
+        }
+
+        //pobranie czasu całego biegu
+        long stopTime = System.currentTimeMillis();
+        long fullTimeInMiliSec = stopTime - shar.getLong(KEY_START_COUNTING_TIME,0);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String fullTime = sdf.format(new Date(fullTimeInMiliSec));
+
+        // pobranie całej listy punktów na mapie i zapisanie do stringa
+        Gson gson = new Gson();
+        String listOfMapPoints = gson.toJson(listLatLng);
+
+        // wysłanie do ActivityMaps broadcast recivera stringa z mapą
+        Intent intent = new Intent();
+        intent.putExtra(KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_MAP_POINTS, listOfMapPoints);
+        intent.putExtra(KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_DISTANCE, distanceInKm);
+        intent.putExtra(KEY_TO_INTENT_OPEN_MAP_LIFE_DATA_STRING_WITH_TIME, fullTime);
+        intent.setAction(getApplicationContext().getPackageName()); // podać package name
+        this.sendBroadcast(intent);
+
+        Log.d(TAG, "onLocationChanged: distance: __________" + distanceInKm);
+        Log.d(TAG, "onLocationChanged: fullTime: __________" + fullTime);
     }
+
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -192,13 +232,29 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         editor.putString(KEY_MAP_POINTS, listOfMapPoints); // do activity z Mapą
         editor.apply(); // musi być na końcu aby zapisać zmiany w shar
 
-        // wysłanie do broadcast reciver danych
+        // wysłanie ActivityWydarzenie do broadcast reciver danych
         Intent serviceIntent = new Intent();
         serviceIntent.putExtra(KEY_DISTANCE, distanceRounded);
         serviceIntent.putExtra(KEY_FULL_TIME, fullTime);
         serviceIntent.putExtra(KEY_SPEED,speed);
-        serviceIntent.setAction("com.wolfmobileapps.zapisy");
+        serviceIntent.setAction(getApplicationContext().getPackageName());
         this.sendBroadcast(serviceIntent);
+
+        // ustawienie notification że jest koniec trasy
+        Intent intent = new Intent(this, ActivityWydarzenie.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_timer_off_black_24dp)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("Zakończono nagrywanie trasy!")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_SOUND) // dodano dzwiek w API<26 (Oero)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(1, builder.build());
     }
 
     //notyfication do foreground service
@@ -212,9 +268,10 @@ public class ServiceWydarzenie extends Service implements LocationListener {
                 .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Trwa rejestowanie Twojej trasy...")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
         notification = builder.build();
     }
 }
+

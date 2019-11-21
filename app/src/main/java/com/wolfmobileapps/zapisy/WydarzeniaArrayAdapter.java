@@ -32,7 +32,7 @@ public class WydarzeniaArrayAdapter extends ArrayAdapter<Wydarzenie> {
         boolean historia = currentItem.getWydarzenieHistoria();
         String wydarzenieTytul = currentItem.getWydarzenieTytul();
         if (historia){
-            wydarzenieTytul = "Wydarzenie przeniesione do historii:\n" + wydarzenieTytul;
+            wydarzenieTytul = "Wydarzenie przeniesione do historii:\n\n" + wydarzenieTytul;
         }
 
         text1.setText(wydarzenieTytul);

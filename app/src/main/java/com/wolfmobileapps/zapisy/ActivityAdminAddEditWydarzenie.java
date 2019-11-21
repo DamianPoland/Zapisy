@@ -201,6 +201,8 @@ public class ActivityAdminAddEditWydarzenie extends AppCompatActivity {
             Wydarzenie wydarzenie = new Wydarzenie(wydarzenieNazwaCollection,wydarzenieTytul,wydarzenieData,wydarzenieCena,wydarzenieOpis,wydarzenieRegulamin,wydarzenieDystans,wydarzenieUczestnicyIlosc,wydarzenieHistoria);
             wydarzenie.addDataToFirestore(ActivityAdminAddEditWydarzenie.this, COLLECTION_NAME_WYDARZENIE, wydarzenieNazwaCollection, wydarzenie);
 
+            Toast.makeText(ActivityAdminAddEditWydarzenie.this, "Wydarzenie dodane", Toast.LENGTH_SHORT).show();
+
             //zamknięcie activity po zapisie
             finish();
 
@@ -211,6 +213,6 @@ public class ActivityAdminAddEditWydarzenie extends AppCompatActivity {
         String wydarzenieNazwaCollection = shar.getString(TO_ACTIVITY_WYDARZENIE_NAZWA_COLLECTION, "error");
         Wydarzenie wydarzenie = new Wydarzenie(wydarzenieNazwaCollection, wydarzenieTytul,wydarzenieData,wydarzenieCena,wydarzenieOpis,wydarzenieRegulamin,wydarzenieDystans,wydarzenieUczestnicyIlosc,wydarzenieHistoria );
         wydarzenie.addDataToFirestore(ActivityAdminAddEditWydarzenie.this, COLLECTION_NAME_WYDARZENIE, wydarzenieNazwaCollection, wydarzenie);
-
+        Toast.makeText(ActivityAdminAddEditWydarzenie.this, "Wydarzenie zaktualizowane", Toast.LENGTH_SHORT).show();
     }
 }

@@ -75,7 +75,7 @@ public class GooglePay {
 
 
     // wpisanie kwoty i waluty
-    private static JSONObject getTransactionInfo(int cena) throws JSONException {
+    private static JSONObject getTransactionInfo(float cena) throws JSONException {
         JSONObject transactionInfo = new JSONObject();
         transactionInfo.put("totalPrice", "" + cena);
         transactionInfo.put("totalPriceStatus", "FINAL");
@@ -102,7 +102,7 @@ public class GooglePay {
     }
 
     // mozna dodać różne dane do zapłąty chyba się bedą wyświetlać
-    public static JSONObject getPaymentDataRequest(int cena) {
+    public static JSONObject getPaymentDataRequest(float cena) {
         try {
             JSONObject paymentDataRequest = GooglePay.getBaseRequest();
             paymentDataRequest.put(

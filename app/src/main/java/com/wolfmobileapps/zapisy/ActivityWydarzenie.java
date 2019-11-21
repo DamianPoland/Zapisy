@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -31,6 +32,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.wallet.AutoResolveHelper;
+import com.google.android.gms.wallet.IsReadyToPayRequest;
+import com.google.android.gms.wallet.PaymentData;
+import com.google.android.gms.wallet.PaymentDataRequest;
+import com.google.android.gms.wallet.PaymentsClient;
+import com.google.android.gms.wallet.Wallet;
+import com.google.android.gms.wallet.WalletConstants;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,6 +50,11 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Optional;
 
 import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_STARTY;
 import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_UCZESTNICY;
@@ -74,7 +91,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
     public static final String DEF_VALUE_TO_CHILD_OF_MY_REF_THIS_USER = "road";
     public static final String DEF_VALUE_TO_SET_FULL_TIME = "00:00:00";
     public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY = "Nagraj trasę";
-    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE = "Trwa nagrywanie trasy...";
+    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE = "Trwa nagrywanie trasy...\n(automatycznie wyłączy się po ";
 
     //views
     private TextView textViewActivityWydarzenieTytul;
@@ -102,6 +119,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
     private LinearLayout linLayNagrajTrasę;
     private LinearLayout linLayNagranaTrasa;
     private Button buttonWyniki;
+    private ImageView imageViewMapaLifeData;
 
     //do Firebase Database
     private FirebaseFirestore db;
@@ -189,13 +207,14 @@ public class ActivityWydarzenie extends AppCompatActivity {
         imageViewgooglePay = findViewById(R.id.imageViewgooglePay);
         linLayZgloszonaTrasa = findViewById(R.id.linLayZgloszonaTrasa);
         linLayNagrajTrasę = findViewById(R.id.linLayNagrajTrasę);
-        linLayNagranaTrasa = findViewById(R.id.lanLayNagranaTrasa);
+        linLayNagranaTrasa = findViewById(R.id.linLayNagranaTrasa);
         buttonWyniki = findViewById(R.id.buttonWyniki);
+        imageViewMapaLifeData = findViewById(R.id.imageViewMapaLifeData);
 
         //ustawienie tekstów
         textViewActivityWydarzenieTytul.setText(tytul);
-        textViewActivityWydarzenieData.setText("Data: "+ data);
-        textViewActivityWydarzenieDystansOgolny.setText("Dystans: " +dystans + " km");
+        textViewActivityWydarzenieData.setText("Data: " + data);
+        textViewActivityWydarzenieDystansOgolny.setText("Dystans: " + dystans + " km");
         textViewActivityWydarzenieUczestnicy.setText("Uczestnicy: " + Math.round(uczestnicyIlosc));
         textViewActivityWydarzenieOpis.setText(opis);
         textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
@@ -208,23 +227,14 @@ public class ActivityWydarzenie extends AppCompatActivity {
             buttonDolacz.setText("Dołącz (" + cena + " zł)");
         }
 
-        //ustawienie przycisku start stop
-        if (shar.getBoolean(KEY_TO_START_STOP, true)) {
-            //ustawienie ikonki na start i text view nagraj trasę
-            imageViewStartStop.setImageDrawable(getDrawable(R.drawable.start_button_transparent));
-            textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
-
-        } else {
-            //ustawienie ikonki na stop i text view nagraj trasę
-            imageViewStartStop.setImageDrawable(getDrawable(R.drawable.stop_button_transparent));
-            textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE);
-        }
-
-        // jeśli wydarzenie jest w historii to ukryje przycisk nagrai i opis i pokaże przycisk wyniki
+        // jeśli wydarzenie jest w historii to ukryje przycisk nagraj i opis i pokaże przycisk wyniki
         if (historia) {
+            linLayNagrajTrasę.setVisibility(View.VISIBLE);
             buttonWyniki.setVisibility(View.VISIBLE);
             imageViewStartStop.setVisibility(View.GONE);
             textViewNagrajTrase.setVisibility(View.GONE);
+            imageViewMapaLifeData.setVisibility(View.GONE);
+
         }
 
         // ustawienie wyników z servisu w textViews
@@ -238,6 +248,44 @@ public class ActivityWydarzenie extends AppCompatActivity {
         animationDown.setDuration(1000);
         animationUp = AnimationUtils.loadAnimation(ActivityWydarzenie.this, R.anim.anim_rotation_up);
         animationUp.setDuration(1000);
+
+        //ustawienie przycisku start stop
+        if (shar.getBoolean(KEY_TO_START_STOP, true)) {
+
+            //ustawienie ikonki na start i nazwy text View Nagraj Trasę
+            setImageAndTextWhenStart();
+
+        } else {
+
+            //ustawienie ikonki na stop i nazwy text View Nagraj Trasę
+            setImageAndTextWhenStop();
+        }
+
+        // broadcast reciver od servisu żeby upgradował text Views
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(getApplicationContext().getPackageName());
+        updateUIReciver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // trzeba zrobić ifa bo servis wysyła tez broadcast do map i żeby go nie łapał
+                if (intent.hasExtra(KEY_DISTANCE)) {
+                    // pobranie danych z servisu za pomocą→ broadcast recivera
+                    float distance = intent.getFloatExtra(KEY_DISTANCE, 0);
+                    String fullTime = intent.getStringExtra(KEY_FULL_TIME);
+                    float speed = intent.getFloatExtra(KEY_SPEED, 0);
+
+                    // ustawienie danych w textViews
+                    setDataInViews(distance, fullTime, speed);
+
+                    //ustawia wszystkie views po zatrzymaniu servisu
+                    changeViewsAfterServiceStop();
+                }
+            }
+        };
+        registerReceiver(updateUIReciver, filter);
+
 
         // przycisk dołącz
         buttonDolacz.setOnClickListener(new View.OnClickListener() {
@@ -280,7 +328,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     }
 
                     //sprawdzeni czy GPS jest włączony
-                    if (!isLocationEnabled(ActivityWydarzenie.this)){
+                    if (!isLocationEnabled(ActivityWydarzenie.this)) {
                         Toast.makeText(ActivityWydarzenie.this, "GPS jest wyłączony!", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -289,13 +337,8 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     Intent intent = new Intent(ActivityWydarzenie.this, ServiceWydarzenie.class);
                     startService(intent);
 
-                    //ustawienie ikonki na stop i nazwy text View Nagraj Trasę
-                    imageViewStartStop.setImageDrawable(getDrawable(R.drawable.stop_button_transparent));
-                    textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE + "\n(wyłączy się po " + dystans + " km)");
-                    //zapisanie do shar  że ma być stop i nazwy text View Nagraj Trasę
-                    editor = shar.edit(); //wywołany edytor do zmian
-                    editor.putBoolean(KEY_TO_START_STOP, false);
-                    editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+                    //zmienia widoki i zapisuje da shar jeśli servis się uruchomi
+                    changeViewsAfterServiceStart();
 
                 } else { // gdy jest przycisk stop
 
@@ -303,20 +346,8 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     Intent intent = new Intent(ActivityWydarzenie.this, ServiceWydarzenie.class);
                     stopService(intent);
 
-                    //ustawienie ikonki na start i nazwy text View Nagraj Trasę
-                    imageViewStartStop.setImageDrawable(getDrawable(R.drawable.start_button_transparent));
-                    textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
-                    //zapisanie do shar  że ma być start i nazwy text View Nagraj Trasę
-                    editor = shar.edit(); //wywołany edytor do zmian
-                    editor.putBoolean(KEY_TO_START_STOP, true);
-                    editor.apply(); // musi być na końcu aby zapisać zmiany w shar
-
-                    // ustawienie wisibility linLay do nagranej trasy
-                    editor = shar.edit(); //wywołany edytor do zmian
-                    editor.putBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, true);
-                    editor.apply(); // musi być na końcu aby zapisać zmiany w shar
-                    //ustawienie visibility linLay do nagranej trasy
-                    changeViewsVisibilityNagranaTrasa();
+                    //zmienia widoki i zapisuje da shar jeśli servis się zatrzyma
+                    changeViewsAfterServiceStop();
                 }
 
             }
@@ -328,21 +359,28 @@ public class ActivityWydarzenie extends AppCompatActivity {
             public void onClick(View v) {
 
                 // pobranie danych z shar Pref
-                String userName = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "User");
+                // userEmail pobrane wcześniej
                 float distance = shar.getFloat(KEY_DISTANCE, 0);
                 String fullTime = shar.getString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME);
                 float speed = shar.getFloat(KEY_SPEED, 0);
                 String mapPoints = shar.getString(KEY_MAP_POINTS, "");
 
-                if (fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)){
+                // zabezpieczenie przed wysłąniem trasy z zerowym wynikiem
+                if (fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
                     Toast.makeText(ActivityWydarzenie.this, "Trasa jest zerowa!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                // zabezpieczenie przed wysłanem z za krótkim dystansem
+                if (distance < dystans * 1000) { // porównanie w metrach nie w km
+                    Toast.makeText(ActivityWydarzenie.this, "Trasa jest za krótka", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 //wysłanie danych na serwer
-                DaneTrasy daneTrasy = new DaneTrasy(userEmail,distance,fullTime,speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
-                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE,dbNameCollection,COLLECTION_NAME_UCZESTNICY,userEmail); // wysłanie do collection Wydarzenia
-                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS,userEmail,COLLECTION_NAME_STARTY,dbNameCollection); // wysłąnie do collection Users
+                DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance, fullTime, speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
+                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE, dbNameCollection, COLLECTION_NAME_UCZESTNICY, userEmail); // wysłanie do collection Wydarzenia
+                daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS, userEmail, COLLECTION_NAME_STARTY, dbNameCollection); // wysłąnie do collection Users
 
                 // ustawienie wisibility linLay do nagranej trasy
                 editor = shar.edit(); //wywołany edytor do zmian
@@ -354,6 +392,11 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 //ustawienie danych zerowych w text views
                 setViewsFromServiseOncore();
+
+                //jeśli będzie zero to znaczy że było tylko dołączenie a nie dodanie trasy więc nie wyświetli komunikatu
+                if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
+                    Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dodanie trasy", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -364,9 +407,9 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 // zapisanie czasu i punktów na mapie w postaci stringa dp shared pref
                 editor = shar.edit(); //wywołany edytor do zmian
-                editor.putFloat(KEY_DISTANCE,0); // do Activity Wydarzenie
+                editor.putFloat(KEY_DISTANCE, 0); // do Activity Wydarzenie
                 editor.putString(KEY_FULL_TIME, DEF_VALUE_TO_SET_FULL_TIME); // do Activity Wydarzenie
-                editor.putFloat(KEY_SPEED,0); // do Activity Wydarzenie
+                editor.putFloat(KEY_SPEED, 0); // do Activity Wydarzenie
                 editor.putString(KEY_MAP_POINTS, ""); // do activity z Mapą
                 editor.apply(); // musi być na końcu aby zapisać zmiany w shar
 
@@ -420,6 +463,15 @@ public class ActivityWydarzenie extends AppCompatActivity {
             }
         });
 
+        imageViewMapaLifeData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //otiwiera mapę pustą do updatowania life data podczas biegnięcia
+                Intent intentMap = new Intent(ActivityWydarzenie.this, ActivityMaps.class);
+                startActivity(intentMap);
+            }
+        });
+
         // przycisk do wyników
         buttonWyniki.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -432,44 +484,114 @@ public class ActivityWydarzenie extends AppCompatActivity {
         });
 
 
-        // broadcast reciver od servisu żeby upgradował text Views
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.wolfmobileapps.zapisy");
-        updateUIReciver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // pobranie danych z servisu za pomocą→ broadcast recivera
-                float distance = intent.getFloatExtra(KEY_DISTANCE, 0);
-                String fullTime = intent.getStringExtra(KEY_FULL_TIME);
-                float speed = intent.getFloatExtra(KEY_SPEED, 0);
-                // ustawienie danych w textViews
-                setDataInViews(distance, fullTime, speed);
-            }
-        };
-        registerReceiver(updateUIReciver, filter);
-
         // do płatności GooglePay - ustawia możliwość płatności jeśli cena jest większa niż zero
-//        if (cena > 0) {
-//            mPaymentsClient =
-//                    Wallet.getPaymentsClient(
-//                            this,
-//                            new Wallet.WalletOptions.Builder()
-//                                    .setEnvironment(WalletConstants.ENVIRONMENT_TEST)
-//                                    .build());
-//            possiblyShowGooglePayButton(); //startuje z tej metody i sprawdza czy są google pay aktywne i pokazuje button
-//        }
+        if (cena > 0) {
+            mPaymentsClient =
+                    Wallet.getPaymentsClient(
+                            this,
+                            new Wallet.WalletOptions.Builder()
+                                    .setEnvironment(WalletConstants.ENVIRONMENT_TEST)
+                                    .build());
+            possiblyShowGooglePayButton(); //startuje z tej metody i sprawdza czy są google pay aktywne i pokazuje button
+        }
 
 
     } //koniec onCreate_____________________________________________________________________
 
 
+    //zmienia widoki i zapisuje da shar jeśli servis się uruchomi
+    private void changeViewsAfterServiceStart() {
 
-    // metoda dodaje listenera i słucha wszystkiego cosię dzieje w zapisie trasy w wydarzenia
-    private void addListenerToFirebaseWydarzeniaDanaTrasa () {
+        //ustawienie ikonki na stop i nazwy text View Nagraj Trasę
+        setImageAndTextWhenStop();
+
+        //zapisanie do shar  że ma być stop i nazwy text View Nagraj Trasę
+        editor = shar.edit(); //wywołany edytor do zmian
+        editor.putBoolean(KEY_TO_START_STOP, false);
+        editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+    }
+
+    //ustawienie ikonki na stop i nazwy text View Nagraj Trasę
+    private void setImageAndTextWhenStop() {
+        imageViewStartStop.setImageDrawable(getDrawable(R.drawable.stop_button_transparent));
+        textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE + dystans + " km)");
+    }
+
+    //zmienia widoki i zapisuje da shar jeśli servis się zatrzyma
+    private void changeViewsAfterServiceStop() {
+
+        //ustawienie ikonki na start i nazwy text View Nagraj Trasę
+        setImageAndTextWhenStart();
+
+        //zapisanie do shar  że ma być start i nazwy text View Nagraj Trasę
+        editor = shar.edit(); //wywołany edytor do zmian
+        editor.putBoolean(KEY_TO_START_STOP, true);
+        editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+
+        // ustawienie wisibility linLay do nagranej trasy
+        editor = shar.edit(); //wywołany edytor do zmian
+        editor.putBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, true);
+        editor.apply(); // musi być na końcu aby zapisać zmiany w shar
+
+        //ustawienie visibility linLay do nagranej trasy
+        changeViewsVisibilityNagranaTrasa();
+    }
+
+    //ustawienie ikonki na start i nazwy text View Nagraj Trasę
+    private void setImageAndTextWhenStart() {
+        imageViewStartStop.setImageDrawable(getDrawable(R.drawable.start_button_transparent));
+        textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
+    }
+
+    // metoda do zmiększenia o jeden liczby uczestników wyświetlanych w bazie
+    private void addOneNumberOfUsersToDb() {
+
+        //Read only once Document - nie trzeba go potem wyłączać  (onCompleateListener):
+        DocumentReference docRefWydarzenia = db.collection(COLLECTION_NAME_WYDARZENIE).document(dbNameCollection);
+        docRefWydarzenia.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
+                        //pobranie danych
+
+                        //dodanie kolejnych wydarzeń
+                        String wydarzenieNazwaCollection = (String) document.getData().get("wydarzenieNazwaCollection");
+                        String wydarzenieTytul = (String) document.getData().get("wydarzenieTytul");
+                        String wydarzenieData = (String) document.getData().get("wydarzenieData");
+                        float wydarzenieCena = Float.parseFloat("" + document.getData().get("wydarzenieCena"));
+                        String wydarzenieOpis = (String) document.getData().get("wydarzenieOpis");
+                        String wydarzenieRegulamin = (String) document.getData().get("wydarzenieRegulamin");
+                        float wydarzenieDystans = Float.parseFloat("" + document.getData().get("wydarzenieDystans"));
+                        float wydarzenieUczestnicyIlosc = Float.parseFloat("" + document.getData().get("wydarzenieUczestnicyIlosc"));
+                        boolean wydarzenieHistoria = Boolean.parseBoolean("" + document.getData().get("wydarzenieHistoria"));
+
+                        // dodanie jednego uczestnika
+                        wydarzenieUczestnicyIlosc += 1;
+
+                        // utworzenie wydarzenia z jednym uczestnikiem wiecej
+                        Wydarzenie wydarzenie = new Wydarzenie(wydarzenieNazwaCollection, wydarzenieTytul, wydarzenieData, wydarzenieCena, wydarzenieOpis, wydarzenieRegulamin, wydarzenieDystans, wydarzenieUczestnicyIlosc, wydarzenieHistoria);
+
+                        // wysłąnie danych do firebase
+                        wydarzenie.addDataToFirestore(ActivityWydarzenie.this, COLLECTION_NAME_WYDARZENIE, wydarzenieNazwaCollection, wydarzenie);
+
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    // metoda dodaje listenera i słucha wszystkiego cosię dzieje w zapisie trasy w Users a nie w wydarzenia czyliss łuchaw tej ścieżce: (COLLECTION_NAME_USERS,userEmail,COLLECTION_NAME_STARTY,dbNameCollection), żeby słychał w wynikach to trzeba podać tą ściężkę: (COLLECTION_NAME_WYDARZENIE,dbNameCollection,COLLECTION_NAME_UCZESTNICY,userEmail)
+    private void addListenerToFirebaseWydarzeniaDanaTrasa() {
         // słucha zmian na serwerze - ukrywa przycisk dołacz jak jest wysłane coś na serwer pod child user Email
-        final DocumentReference docRef = db.collection(COLLECTION_NAME_WYDARZENIE).document(dbNameCollection).collection(COLLECTION_NAME_UCZESTNICY).document(userEmail);
+        final DocumentReference docRef = db.collection(COLLECTION_NAME_USERS).document(userEmail).collection(COLLECTION_NAME_STARTY).document(dbNameCollection);
         registration = docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
@@ -494,7 +616,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
     }
 
     // pokazanie lub wyłączenie widoków gdy się dodaje lub zmienia w firebase child
-    private void changeViewsVisibilityAfterAddOrChangeChild(DocumentSnapshot snapshot){
+    private void changeViewsVisibilityAfterAddOrChangeChild(DocumentSnapshot snapshot) {
 
         // wyłączenie przycisków dołacz i do płątności
         buttonDolacz.setVisibility(View.GONE);
@@ -520,12 +642,19 @@ public class ActivityWydarzenie extends AppCompatActivity {
     }
 
     //ustawienie visibility linLay do nagranej trasy
-    private void changeViewsVisibilityNagranaTrasa(){
+    private void changeViewsVisibilityNagranaTrasa() {
+
+        // nie pokaże linLayNagranaTrasa jeśli wydarzenie jest w historii
+        if (historia) {
+            return;
+        }
+
+        //ustawienie visibility linLay do nagranej trasy
         if (shar.getBoolean(KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA, false)) {
             linLayNagranaTrasa.setVisibility(View.VISIBLE);
             linLayNagranaTrasa.startAnimation(animationDown);
         } else {
-            if (linLayNagranaTrasa.getVisibility()==View.VISIBLE){
+            if (linLayNagranaTrasa.getVisibility() == View.VISIBLE) {
 
                 linLayNagranaTrasa.startAnimation(animationUp);
                 // ustawienie animation listenera żeby po skończeniu animacji wyłączył widok
@@ -533,10 +662,12 @@ public class ActivityWydarzenie extends AppCompatActivity {
                     @Override
                     public void onAnimationStart(Animation animation) {
                     }
+
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         linLayNagranaTrasa.setVisibility(View.INVISIBLE);
                     }
+
                     @Override
                     public void onAnimationRepeat(Animation animation) {
                     }
@@ -556,10 +687,13 @@ public class ActivityWydarzenie extends AppCompatActivity {
         String mapPoints = "";
 
         //wysłanie uczestnictwa naserwer
-        DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance,fullTime,speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
-        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE,dbNameCollection,COLLECTION_NAME_UCZESTNICY,userEmail); // wysłanie do collection Wydarzenia
-        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS,userEmail,COLLECTION_NAME_STARTY,dbNameCollection); // wysłąnie do collection Users
+        DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance, fullTime, speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
+        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE, dbNameCollection, COLLECTION_NAME_UCZESTNICY, userEmail); // wysłanie do collection Wydarzenia
+        daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS, userEmail, COLLECTION_NAME_STARTY, dbNameCollection); // wysłąnie do collection Users
         Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dołączenie do wydarzenia", Toast.LENGTH_SHORT).show();
+
+        // zaktualizowanie danych dotyczących ilości uczestników
+        addOneNumberOfUsersToDb();
     }
 
     // pobranie danych o zapisanej trasie z Firebase
@@ -624,9 +758,10 @@ public class ActivityWydarzenie extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.app_name); //chanel name
             String description = getString(R.string.app_name); //chanel description
-            int importance = NotificationManager.IMPORTANCE_LOW;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.enableVibration(true);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -708,142 +843,141 @@ public class ActivityWydarzenie extends AppCompatActivity {
     //-------------------------------------------------- Do goole pay----------------------------------------------------------------
 
 
-//    private PaymentsClient mPaymentsClient;
-//
-//    private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 42;
-//
-//
-//    //startuje z tej metody i sprawdza czy są google pay aktywne i jesli tak to pokazuje button
-//    private void possiblyShowGooglePayButton() {
-//        if (GooglePay.getIsReadyToPayRequest() == null) {
-//            Toast.makeText(this, "Google PAY są niedostępne", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//        JSONObject isReadyToPayJson = GooglePay.getIsReadyToPayRequest();
-//        IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
-//        if (request == null) {
-//            Toast.makeText(this, "Google PAY nie jest gotowe do wykonania płatności.", Toast.LENGTH_LONG).show();
-//            return;
-//        }
-//        Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
-//        task.addOnCompleteListener(
-//                new OnCompleteListener<Boolean>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Boolean> task) {
-//                        try {
-//                            boolean result = task.getResult(ApiException.class);
-//                            if (result) {
-//                                // show Google as a payment option
-//                                imageViewgooglePay.setOnClickListener(
-//                                        new View.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(View view) {
-//
-//                                                // po kliknięciu na button uruchamia tą metodę
-//                                                requestPayment(view);
-//                                            }
-//                                        });
-//                                imageViewgooglePay.setVisibility(View.VISIBLE);
-//                            }
-//                        } catch (ApiException exception) {
-//                            // handle developer errors
-//                        }
-//                    }
-//                });
-//    }
-//
-//
-//    // po kliknięciu na button uruchamia tą metodę
-//    public void requestPayment(View view) {
-//        if (GooglePay.getPaymentDataRequest(cena) == null) {
-//            return;
-//        }
-//        JSONObject paymentDataRequestJson = GooglePay.getPaymentDataRequest(cena);
-//        PaymentDataRequest request =
-//                PaymentDataRequest.fromJson(paymentDataRequestJson.toString());
-//        if (request != null) {
-//            AutoResolveHelper.resolveTask(
-//                    mPaymentsClient.loadPaymentData(request), this, LOAD_PAYMENT_DATA_REQUEST_CODE);
-//        }
-//    }
-//
-//
-//    /**
-//     * Handle a resolved activity from the Google Pay payment sheet
-//     *
-//     * @param requestCode the request code originally supplied to AutoResolveHelper in
-//     *                    requestPayment()
-//     * @param resultCode  the result code returned by the Google Pay API
-//     * @param data        an Intent from the Google Pay API containing payment or error data
-//     * @see <a href="https://developer.android.com/training/basics/intents/result">Getting a result
-//     * from an Activity</a>
-//     */
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        //super.onActivityResult(requestCode, resultCode, data);
-//        switch (requestCode) {
-//            // value passed in AutoResolveHelper
-//            case LOAD_PAYMENT_DATA_REQUEST_CODE:
-//                switch (resultCode) {
-//                    case Activity.RESULT_OK:
-//                        PaymentData paymentData = PaymentData.getFromIntent(data);
-//                        String json = paymentData.toJson();
-//                        // if using gateway tokenization, pass this token without modification
-//                        JSONObject paymentMethodData = null;
-//                        try {
-//                            paymentMethodData = new JSONObject(json).getJSONObject("paymentMethodData");
-//                            // Alert dialog po to że jeśli - If the gateway is set to "example", no payment information is returned - instead, the token will only consist of "examplePaymentMethodToken".
-//                            if (paymentMethodData
-//                                    .getJSONObject("tokenizationData")
-//                                    .getString("type")
-//                                    .equals("PAYMENT_GATEWAY")
-//                                    && paymentMethodData
-//                                    .getJSONObject("tokenizationData")
-//                                    .getString("token")
-//                                    .equals("examplePaymentMethodToken")) {
-//                                AlertDialog alertDialog =
-//                                        new AlertDialog.Builder(this)
-//                                                .setTitle("Warning")
-//                                                .setMessage("Gateway name set to \"example\" - please modify " + "Constants.java and replace it with your own gateway.")
-//                                                .setPositiveButton("OK", null)
-//                                                .create();
-//                                alertDialog.show();
-//                            }
-//
-//                            //log do tokena
-//                            Log.d(TAG, "onActivityResult: paymentToken: " + paymentMethodData.getJSONObject("tokenizationData").getString("token"));
-//
-//                            //gdy się powiedzie opłata
-//                            String billingName =
-//                                    paymentMethodData.getJSONObject("info").getJSONObject("billingAddress").getString("name");
-//                            Log.d("BillingName", billingName);
-//                            Toast.makeText(this, "Płatność została dokonana. \nDziękujemy.", Toast.LENGTH_LONG).show();
-//
-//                            // włączyć metode z dołącz gdy zostało opłacone
-//                            joinToEvent();
-//
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                        break;
-//                    case Activity.RESULT_CANCELED:
-//                        // Nothing to here normally - the user simply cancelled without selecting a payment method.
-//                        break;
-//                    case AutoResolveHelper.RESULT_ERROR:
-//                        Status status = AutoResolveHelper.getStatusFromIntent(data);
-//                        Toast.makeText(this, "ERROR. Nie dokonano płatności.", Toast.LENGTH_SHORT).show();
-//                        Log.d(TAG, "onActivityResult: RESULT_ERROR: " + status.getStatusMessage());
-//                        break;
-//                    default:
-//                        // Do nothing.
-//                }
-//                break;
-//            default:
-//                // Do nothing.
-//        }
-//    }
+    private PaymentsClient mPaymentsClient;
+
+    private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 42;
+
+
+    //startuje z tej metody i sprawdza czy są google pay aktywne i jesli tak to pokazuje button
+    private void possiblyShowGooglePayButton() {
+        if (GooglePay.getIsReadyToPayRequest() == null) {
+            Toast.makeText(this, "Google PAY są niedostępne", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        JSONObject isReadyToPayJson = GooglePay.getIsReadyToPayRequest();
+        IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.toString());
+        if (request == null) {
+            Toast.makeText(this, "Google PAY nie jest gotowe do wykonania płatności.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
+        task.addOnCompleteListener(
+                new OnCompleteListener<Boolean>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Boolean> task) {
+                        try {
+                            boolean result = task.getResult(ApiException.class);
+                            if (result) {
+                                // show Google as a payment option
+                                imageViewgooglePay.setOnClickListener(
+                                        new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+
+                                                // po kliknięciu na button uruchamia tą metodę
+                                                requestPayment(view);
+                                            }
+                                        });
+                                imageViewgooglePay.setVisibility(View.VISIBLE);
+                            }
+                        } catch (ApiException exception) {
+                            // handle developer errors
+                        }
+                    }
+                });
+    }
+
+
+    // po kliknięciu na button uruchamia tą metodę
+    public void requestPayment(View view) {
+        if (GooglePay.getPaymentDataRequest(cena)==null){
+            return;
+        }
+        JSONObject paymentDataRequestJson = GooglePay.getPaymentDataRequest(cena);
+        PaymentDataRequest request =
+                PaymentDataRequest.fromJson(paymentDataRequestJson.toString());
+        if (request != null) {
+            AutoResolveHelper.resolveTask(
+                    mPaymentsClient.loadPaymentData(request), this, LOAD_PAYMENT_DATA_REQUEST_CODE);
+        }
+    }
+
+    /**
+     * Handle a resolved activity from the Google Pay payment sheet
+     *
+     * @param requestCode the request code originally supplied to AutoResolveHelper in
+     *                    requestPayment()
+     * @param resultCode  the result code returned by the Google Pay API
+     * @param data        an Intent from the Google Pay API containing payment or error data
+     * @see <a href="https://developer.android.com/training/basics/intents/result">Getting a result
+     * from an Activity</a>
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            // value passed in AutoResolveHelper
+            case LOAD_PAYMENT_DATA_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        PaymentData paymentData = PaymentData.getFromIntent(data);
+                        String json = paymentData.toJson();
+                        // if using gateway tokenization, pass this token without modification
+                        JSONObject paymentMethodData = null;
+                        try {
+                            paymentMethodData = new JSONObject(json).getJSONObject("paymentMethodData");
+                            // Alert dialog po to że jeśli - If the gateway is set to "example", no payment information is returned - instead, the token will only consist of "examplePaymentMethodToken".
+                            if (paymentMethodData
+                                    .getJSONObject("tokenizationData")
+                                    .getString("type")
+                                    .equals("PAYMENT_GATEWAY")
+                                    && paymentMethodData
+                                    .getJSONObject("tokenizationData")
+                                    .getString("token")
+                                    .equals("examplePaymentMethodToken")) {
+                                AlertDialog alertDialog =
+                                        new AlertDialog.Builder(this)
+                                                .setTitle("Warning")
+                                                .setMessage("Gateway name set to \"example\" - please modify " + "Constants.java and replace it with your own gateway.")
+                                                .setPositiveButton("OK", null)
+                                                .create();
+                                alertDialog.show();
+                            }
+
+                            //log do tokena
+                            Log.d(TAG, "onActivityResult: paymentToken: " + paymentMethodData.getJSONObject("tokenizationData").getString("token"));
+
+                            //gdy się powiedzie opłata
+                            String billingName =
+                                    paymentMethodData.getJSONObject("info").getJSONObject("billingAddress").getString("name");
+                            Log.d("BillingName", billingName);
+                            Toast.makeText(this, "Płatność została dokonana. \nDziękujemy.", Toast.LENGTH_LONG).show();
+
+                            // włączyć metode z dołącz gdy zostało opłacone
+                            joinToEvent();
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // Nothing to here normally - the user simply cancelled without selecting a payment method.
+                        break;
+                    case AutoResolveHelper.RESULT_ERROR:
+                        Status status = AutoResolveHelper.getStatusFromIntent(data);
+                        Toast.makeText(this, "ERROR. Nie dokonano płatności.", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onActivityResult: RESULT_ERROR: " + status.getStatusMessage());
+                        break;
+                    default:
+                        // Do nothing.
+                }
+                break;
+            default:
+                // Do nothing.
+        }
+    }
 
 }
 

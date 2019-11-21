@@ -1,23 +1,31 @@
 package com.wolfmobileapps.zapisy;
 
-import androidx.annotation.NonNull;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -26,9 +34,12 @@ import java.util.Collections;
 import java.util.Comparator;
 
 
+import static com.wolfmobileapps.zapisy.ActivityWydarzenie.DEF_VALUE_TO_SET_FULL_TIME;
 import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_UCZESTNICY;
 import static com.wolfmobileapps.zapisy.MainActivity.COLLECTION_NAME_WYDARZENIE;
+import static com.wolfmobileapps.zapisy.MainActivity.KEY_MAP_POINTS_TO_INTENT_OPEN_MAP_LIST;
 import static com.wolfmobileapps.zapisy.MainActivity.SHARED_PREFERENCES_NAME;
+import static com.wolfmobileapps.zapisy.MainActivity.TABLE_OF_ADMINS;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_CENA;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_DATA;
 import static com.wolfmobileapps.zapisy.MainActivity.TO_ACTIVITY_WYDARZENIE_DYSTANS;
@@ -75,8 +86,13 @@ public class ActivityWyniki extends AppCompatActivity {
     private ArrayList<DaneTrasy> listMainWyniki;
     private WynikiArrayAdapter adapter;
 
+    // lista ze wszystkimi trasami w Stringach
+    private ArrayList<String> listOfRouds;
+
     //do Firebase Database
     private FirebaseFirestore db;
+    private  ListenerRegistration registration;
+
 
 
 
@@ -84,7 +100,6 @@ public class ActivityWyniki extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wyniki);
-
 
         //views
         textViewTytulWyniki = findViewById(R.id.textViewTytulWyniki);
@@ -113,6 +128,9 @@ public class ActivityWyniki extends AppCompatActivity {
         textViewTytulWyniki.setText(tytul);
         textViewActivityWydarzenieDystansWyniki.setText("Dystans: " + dystans + " km");
 
+        // lista ze wszystkimi trasami w Stringach
+        listOfRouds = new ArrayList<>();
+
         //wyświetlenie w listView z Wynikami
         listMainWyniki = new ArrayList<>();
         adapter = new WynikiArrayAdapter(this, 0, listMainWyniki);
@@ -121,22 +139,99 @@ public class ActivityWyniki extends AppCompatActivity {
         // do Firebase instancja Database
         db = FirebaseFirestore.getInstance();
 
-        // Read only once Collection - nie trzeba go potem wyłączać  (onCompleateListener):
-        db.collection(COLLECTION_NAME_WYDARZENIE).document(dbNameCollection).collection(COLLECTION_NAME_UCZESTNICY)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+        listViewWyniki.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                                //pobranie danych z listenera
-                                String userEmail = (String) document.getData().get("userEmail");
-                                float distance = Float.parseFloat( "" + document.getData().get("distance"));
-                                String fullTime = (String) document.getData().get("fullTime");
-                                float speed = Float.parseFloat( "" +  document.getData().get("speed"));
-                                String mapPoints = (String) document.getData().get("mapPoints");
+                //ustawienie widoczności guzika dla admina
+                String emailAdmin = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, "");
+                if (emailAdmin.equals(TABLE_OF_ADMINS[0]) || emailAdmin.equals(TABLE_OF_ADMINS[1]) || emailAdmin.equals(TABLE_OF_ADMINS[2]) || emailAdmin.equals(TABLE_OF_ADMINS[3])) {
+
+
+                    // alert z pytaniem czy usunąć wynik
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ActivityWyniki.this);
+                    builder.setTitle("USUWANIE");
+                    builder.setMessage("Czy napewno chcesz usunąć ten wynik z bazy?");
+                    builder.setPositiveButton("TAK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            // pobiera email użytkownika do usunięcia który też jest ścieszka
+                            DaneTrasy currenDaneTrasy = listMainWyniki.get(position);
+                            String userEmail = currenDaneTrasy.getUserEmail();
+
+                            // usuwa trasę użytkownika tylko z wydarzenia, w user zostaje żeby user miał do niej wgląd ale już wynikach się nie pokazuje bo tabela jest czytana zwyników
+                            DaneTrasy daneTrasy = new DaneTrasy();
+                            daneTrasy.deleteDataDataFirebase(ActivityWyniki.this,COLLECTION_NAME_WYDARZENIE, dbNameCollection, COLLECTION_NAME_UCZESTNICY, userEmail);
+                        }
+                    }).setNegativeButton("NIE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // nic nie robi
+                        }
+                    }).create();
+                    builder.show();
+
+
+
+                }
+            }
+        });
+
+        // buttony
+        imageViewMapaWyniki.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //otwarcie mapy ze wszystkimi trrasami czyli z listą tras
+                Intent intent = new Intent(ActivityWyniki.this, ActivityMaps.class);
+                intent.putExtra(KEY_MAP_POINTS_TO_INTENT_OPEN_MAP_LIST, listOfRouds);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    // włacznie listenera żeby słuchał wszystkiego co się dzieje i wczytywał do list view ( nasłuchuje cały czas wiec trzeba wyłaczyć potem)
+    private void readEncoreFromDb () {
+
+        // wyczyszczenie adaptera przed dodaniem od nowego listenera
+        adapter.clear();
+
+        // wyłaczenie listenera jeśli już jest odpalony - inaczej działają dwa na raaz i sei d ublują
+        if (registration != null){
+            registration.remove();
+        }
+
+        //wyczyszczenie listy tras jeśli coś było
+        if (listOfRouds.size() != 0){
+            listOfRouds.clear();
+        }
+
+        //słucha wszystkiego cosię dzieje wdanym folderze, odpala się za każdym razem
+        CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE).document(dbNameCollection).collection(COLLECTION_NAME_UCZESTNICY);
+        registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.d(TAG, "city listen:error", e);
+                    return;
+                }
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d(TAG, "New city: " + dc.getDocument().getData());
+
+                            //pobranie danych z listenera
+                            String userEmail = (String) dc.getDocument().getData().get("userEmail");
+                            float distance = Float.parseFloat( "" + dc.getDocument().getData().get("distance"));
+                            String fullTime = (String) dc.getDocument().getData().get("fullTime");
+                            float speed = Float.parseFloat( "" +  dc.getDocument().getData().get("speed"));
+                            String mapPoints = (String) dc.getDocument().getData().get("mapPoints");
+
+                            // jeśli czas nie będzie zero to doda do adaptera
+                            if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
 
                                 //dodanie danych do adaptera żeby wyświetlił w list View
                                 DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance, fullTime, speed, mapPoints);
@@ -147,26 +242,46 @@ public class ActivityWyniki extends AppCompatActivity {
                                 Collections.sort(listMainWyniki, compareByTime);
                                 adapter.notifyDataSetChanged();
 
-                                //wyłaczenie  progress bara
-                                progressBarWyniki.setVisibility(View.GONE);
+                                // dodanie trasy do listy ze stringami
+                                listOfRouds.add(mapPoints);
                             }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
+
+                            //wyłaczenie  progress bara
+                            progressBarWyniki.setVisibility(View.GONE);
+
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+
+                            // jak usunięto element to uruchamia cała bazę od nowa
+                            readEncoreFromDb();
+                            break;
                     }
-                });
-
-
-
-        // buttony
-        imageViewMapaWyniki.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //otwarcie mapy ze wszystkimi trrasami
-
+                }
             }
         });
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        //metoda dodaje listenera i słucha wszystkiego cosię dzieje w danym folderze "Wydarzenia"
+        readEncoreFromDb();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // wyłaczenie listenera
+        registration.remove();
+
+    }
+
 }
+

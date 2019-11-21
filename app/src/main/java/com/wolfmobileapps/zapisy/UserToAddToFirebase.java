@@ -34,13 +34,13 @@ public class UserToAddToFirebase {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Wydarzenie dodane", Toast.LENGTH_SHORT).show();
+                        // do nothing
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, "Error - wydarzenie nie dodane", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

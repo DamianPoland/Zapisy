@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/item_ripple_effect"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewListUserEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email: "
+                android:textStyle="bold"
+                android:textSize="16sp" />
+            <TextView
+                android:id="@+id/textViewListUserNameAndSurnameFromGoogle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Imię i Nazwisko z konta Google: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewListUserNameAndSurname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Imię i Nazwisko: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewListUserAdres"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adres: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewListUserMiasto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Miasto: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewListUserKodPocztowy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kod pocztowy: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textViewListUserNrTelefonu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nr telefonu: "
+                android:textColor="@color/colorPrimaryDarkBlue900"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

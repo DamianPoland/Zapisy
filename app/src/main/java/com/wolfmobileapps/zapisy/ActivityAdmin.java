@@ -1,6 +1,5 @@
 package com.wolfmobileapps.zapisy;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,10 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.annotations.Nullable;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -92,7 +88,14 @@ public class ActivityAdmin extends AppCompatActivity {
 
     // metoda dodaje listenera i słucha wszystkiego cosię dzieje wdanym folderze "Wydarzenia"
     private void addListenerToFirebaseWydarzenia () {
-        adapter.clear(); // wyczyszczenie adaptera przed dodaniem od nowa listenera
+
+        // wyczyszczenie adaptera przed dodaniem od nowa listenera
+        adapter.clear();
+
+        // wyłaczenie listenera jeśli już jest odpalony - inaczej działają dwa na raaz i sei d ublują
+        if (registration != null){
+            registration.remove();
+        }
 
         //słucha wszystkiego cosię dzieje wdanym folderze tu "Wydarzenia", odpala się za każdym razem
         CollectionReference query = db.collection(COLLECTION_NAME_WYDARZENIE);
@@ -128,6 +131,9 @@ public class ActivityAdmin extends AppCompatActivity {
                             Log.d(TAG, "onEvent: ________" + dc.getDocument().getData());
                             break;
                         case MODIFIED:
+
+                            // jeśli jakieś wydarzenie zostało zmienione to przeładuje listę
+                            addListenerToFirebaseWydarzenia();
                             Log.d(TAG, "Modified city: " + dc.getDocument().getData());
                             break;
                         case REMOVED:
@@ -161,9 +167,13 @@ public class ActivityAdmin extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_dodaj:
-                Intent intent = new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class);
-                intent.putExtra("nowy", true);
-                startActivity(intent);
+                Intent intentEdit = new Intent(ActivityAdmin.this, ActivityAdminAddEditWydarzenie.class);
+                intentEdit.putExtra("nowy", true);
+                startActivity(intentEdit);
+                break;
+            case R.id.menu_users:
+                Intent intentUsersList = new Intent(ActivityAdmin.this, ActivityAdminListUsers.class);
+                startActivity(intentUsersList);
                 break;
         }
         return super.onOptionsItemSelected(item);
