@@ -90,8 +90,8 @@ public class ActivityWydarzenie extends AppCompatActivity {
     public static final String KEY_TO_VISIBILITY_LIN_LAY_NAGRANA_TRASA = "key to visibility linLay nagrana trasa";
     public static final String DEF_VALUE_TO_CHILD_OF_MY_REF_THIS_USER = "road";
     public static final String DEF_VALUE_TO_SET_FULL_TIME = "00:00:00";
-    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY = "Nagraj trasę";
-    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE = "Trwa nagrywanie trasy...\n(automatycznie wyłączy się po ";
+    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY = "Record route";
+    public static final String DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY_TRWA_NAGRYWANIE = "The route is recorded...\nwill automatically turn off after ";
 
     //views
     private TextView textViewActivityWydarzenieTytul;
@@ -161,7 +161,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
         setContentView(R.layout.activity_wydarzenie);
 
         //ustawia up button
-        getSupportActionBar().setTitle("Powrót"); //ustawia nazwę na górze
+        getSupportActionBar().setTitle("Event"); //ustawia nazwę na górze
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // ustawia strzałkę
 
         // metoda tworząca notificationChanel
@@ -213,18 +213,18 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
         //ustawienie tekstów
         textViewActivityWydarzenieTytul.setText(tytul);
-        textViewActivityWydarzenieData.setText("Data: " + data);
-        textViewActivityWydarzenieDystansOgolny.setText("Dystans: " + dystans + " km");
-        textViewActivityWydarzenieUczestnicy.setText("Uczestnicy: " + Math.round(uczestnicyIlosc));
+        textViewActivityWydarzenieData.setText("Date: " + data);
+        textViewActivityWydarzenieDystansOgolny.setText("Distance: " + dystans + " km");
+        textViewActivityWydarzenieUczestnicy.setText("Participants: " + Math.round(uczestnicyIlosc));
         textViewActivityWydarzenieOpis.setText(opis);
         textViewNagrajTrase.setText(DEF_VALUE_TO_VIEW_NAGRYWANIE_TRASY);
 
         //ustawienie tekstu dołącz i przycisku googlePay
         if (cena == 0) {
-            buttonDolacz.setText("Dołącz");
+            buttonDolacz.setText("Join");
             imageViewgooglePay.setVisibility(View.GONE);
         } else {
-            buttonDolacz.setText("Dołącz (" + cena + " zł)");
+            buttonDolacz.setText("Join (" + cena + " zł)");
         }
 
         // jeśli wydarzenie jest w historii to ukryje przycisk nagraj i opis i pokaże przycisk wyniki
@@ -329,7 +329,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                     //sprawdzeni czy GPS jest włączony
                     if (!isLocationEnabled(ActivityWydarzenie.this)) {
-                        Toast.makeText(ActivityWydarzenie.this, "GPS jest wyłączony!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ActivityWydarzenie.this, "GPS is turned off!", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -367,13 +367,13 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 // zabezpieczenie przed wysłąniem trasy z zerowym wynikiem
                 if (fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
-                    Toast.makeText(ActivityWydarzenie.this, "Trasa jest zerowa!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityWydarzenie.this, "The route is zero!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 // zabezpieczenie przed wysłanem z za krótkim dystansem
                 if (distance < dystans * 1000) { // porównanie w metrach nie w km
-                    Toast.makeText(ActivityWydarzenie.this, "Trasa jest za krótka", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityWydarzenie.this, "The route is too short", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -395,7 +395,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 //jeśli będzie zero to znaczy że było tylko dołączenie a nie dodanie trasy więc nie wyświetli komunikatu
                 if (!fullTime.equals(DEF_VALUE_TO_SET_FULL_TIME)) {
-                    Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dodanie trasy", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityWydarzenie.this, "Thank you for adding the route", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -433,7 +433,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
                 //zabezpieczenie przed tym żeby mapa się nie otworzyła jak jest pusta lista punktów na mapie
                 String listLatLngString = shar.getString(KEY_MAP_POINTS, "");
                 if (listLatLngString.equals("")) {
-                    Toast.makeText(ActivityWydarzenie.this, "Jeszcze nie zapisałeś żadnej trasy", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityWydarzenie.this, "You haven't saved any routes yet", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -452,7 +452,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
                 //zabezpieczenie przed tym żeby mapa się nie otworzyła jak jest pusta lista punktów na mapie
                 String listLatLngString = shar.getString(KEY_MAP_POINTS_FROM_FIREBASE, "");
                 if (listLatLngString.equals("")) {
-                    Toast.makeText(ActivityWydarzenie.this, "Jeszcze nie zapisałeś żadnej trasy", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityWydarzenie.this, "You haven't saved any routes yet", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -690,7 +690,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
         DaneTrasy daneTrasy = new DaneTrasy(userEmail, distance, fullTime, speed, mapPoints); //utworzenie obiektu daneTrasy aby wysłąć do Firebase
         daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_WYDARZENIE, dbNameCollection, COLLECTION_NAME_UCZESTNICY, userEmail); // wysłanie do collection Wydarzenia
         daneTrasy.sentDataToFirebase(ActivityWydarzenie.this, daneTrasy, COLLECTION_NAME_USERS, userEmail, COLLECTION_NAME_STARTY, dbNameCollection); // wysłąnie do collection Users
-        Toast.makeText(ActivityWydarzenie.this, "Dziękujemy za dołączenie do wydarzenia", Toast.LENGTH_SHORT).show();
+        Toast.makeText(ActivityWydarzenie.this, "Thank you for joining the event", Toast.LENGTH_SHORT).show();
 
         // zaktualizowanie danych dotyczących ilości uczestników
         addOneNumberOfUsersToDb();
@@ -727,16 +727,16 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
     // ustawienie danych w textViews
     private void setDataInViews(float distance, String fullTime, float speed) {
-        textViewActivityWydarzenieDystans.setText("Dystans: " + distance + " m");
-        textViewActivityWydarzenieCzas.setText("Czas: " + fullTime + " s");
-        textViewActivityWydarzeniePredkosc.setText("Prędkość: " + speed + " km/h");
+        textViewActivityWydarzenieDystans.setText("Distance: " + distance + " m");
+        textViewActivityWydarzenieCzas.setText("Time: " + fullTime + " s");
+        textViewActivityWydarzeniePredkosc.setText("Speed: " + speed + " km/h");
     }
 
     // ustawienie danych pobranych z FIREBASE w textViews FIREBASE
     private void setDataInViewsFIREBASE(float distanceFIREBASE, String fullTimeFIREBASE, float speedFIREBASE) {
-        textViewActivityWydarzenieDystansFIREBASE.setText("Dystans: " + distanceFIREBASE + " m");
-        textViewActivityWydarzenieCzasFIREBASE.setText("Czas: " + fullTimeFIREBASE + " s");
-        textViewActivityWydarzeniePredkoscFIREBASE.setText("Prędkość: " + speedFIREBASE + " km/h");
+        textViewActivityWydarzenieDystansFIREBASE.setText("Distance: " + distanceFIREBASE + " m");
+        textViewActivityWydarzenieCzasFIREBASE.setText("Time: " + fullTimeFIREBASE + " s");
+        textViewActivityWydarzeniePredkoscFIREBASE.setText("Speed: " + speedFIREBASE + " km/h");
     }
 
     //metoda do sprawdzenia czy są nadane permisssions
@@ -818,7 +818,7 @@ public class ActivityWydarzenie extends AppCompatActivity {
 
                 // alert dialog z regulaminem
                 AlertDialog.Builder builder = new AlertDialog.Builder(ActivityWydarzenie.this);
-                builder.setTitle("Regulamin");
+                builder.setTitle("Regulations");
                 builder.setMessage(regulamin);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override

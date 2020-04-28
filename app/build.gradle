@@ -4,25 +4,25 @@ apply plugin: 'com.google.gms.google-services'
 android {
     signingConfigs {
         relesae {
-            storeFile file('D:\\JAVA\\archiwum\\keystore_klucz_do_aplikacji.jks')
+            storeFile file('D:\\J & S pomoce\\Klucze i inne\\Android\\keystore_klucz_do_aplikacji.jks')
             storePassword 'Ninja1'
             keyAlias = 'key1'
             keyPassword 'Ninja1555'
         }
         debug {
-            storeFile file('D:\\JAVA\\archiwum\\keystore_klucz_do_aplikacji.jks')
+            storeFile file('D:\\J & S pomoce\\Klucze i inne\\Android\\keystore_klucz_do_aplikacji.jks')
             storePassword 'Ninja1'
             keyAlias = 'key1'
             keyPassword 'Ninja1555'
         }
     }
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.wolfmobileapps.zapisy"
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 3
-        versionName "0.0.3"
+        targetSdkVersion 29
+        versionCode 101
+        versionName "1.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

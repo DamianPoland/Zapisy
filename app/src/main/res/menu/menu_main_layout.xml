@@ -8,11 +8,11 @@
         android:icon="@drawable/ic_build_white_24dp"
         android:title="Admin"
         android:visible="false"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_user_profile"
         android:icon="@drawable/ic_person_white_24dp"
-        android:title="Profil uczetnika"
+        android:title="Profile"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_info"

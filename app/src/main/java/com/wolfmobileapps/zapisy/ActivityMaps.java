@@ -108,6 +108,7 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
         });
 
         // ustawienie kamery na środku Polski
+        // TODO:
         LatLng latLngSrodekPolski = new LatLng(51.976204,19.403013);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngSrodekPolski,6)); // im większ cyfra tym większe zbliżenie
 

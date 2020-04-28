@@ -27,13 +27,13 @@ public class ListUserArrayAdapter extends ArrayAdapter<UserToAddToFirebase> {
         TextView text6 = convertView.findViewById(R.id.textViewListUserKodPocztowy);
         TextView text7 = convertView.findViewById(R.id.textViewListUserNrTelefonu);
 
-        text1.setText("Email: " + currentItem.getEmailUser());
-        text2.setText("Imię i Nazwisko z konta Google: " + currentItem.getNameUserFromGoogle());
-        text3.setText("Imię i Nazwisko: " + currentItem.getNameAndSurnameUser());
-        text4.setText("Adres: " + currentItem.getAdressUser());
-        text5.setText("Miasto: " + currentItem.getCityUser());
-        text6.setText("Kod pocztowy: " + currentItem.getPostCodeUser());
-        text7.setText("Nr telefonu: " + currentItem.getTelephoneUser());
+        text1.setText("E-mail: " + currentItem.getEmailUser());
+        text2.setText("Name from Google account: " + currentItem.getNameUserFromGoogle());
+        text3.setText("Name: " + currentItem.getNameAndSurnameUser());
+        text4.setText("Address: " + currentItem.getAdressUser());
+        text5.setText("City: " + currentItem.getCityUser());
+        text6.setText("Postal Code: " + currentItem.getPostCodeUser());
+        text7.setText("Phone number: " + currentItem.getTelephoneUser());
 
         return convertView;
     }

@@ -199,6 +199,8 @@ public class UserActivity extends AppCompatActivity {
         UserToAddToFirebase userToAddToFirebase = new UserToAddToFirebase(emailUser, nameUser, nameAndSurnameUser, adressUser, cityUser, postCodeUser, telephoneUser);
         userToAddToFirebase.addUserToFirestore(UserActivity.this, COLLECTION_NAME_USERS, emailUser, userToAddToFirebase);
 
+        Log.d(TAG, "userZapiszDane: userToAddToFirebase" +userToAddToFirebase.toString());
+
         //wyłaczenie pól edycji i włączenie guzika zmien dane
         linLayUserEdycjaDanychUzytkownika.setVisibility(View.GONE);
         buttonUserZmienDane.setVisibility(View.VISIBLE);
@@ -221,15 +223,41 @@ public class UserActivity extends AppCompatActivity {
                     Log.d(TAG, "Current data: " + snapshot.getData());
 
                     // pobranie danych z serwera po zmianie
-                    String emailUserAndDescription = "Email: " + emailUser;
-                    String nameAndSurnameUser = "Imię i Nazwisko: " + (String) snapshot.getData().get("nameAndSurnameUser");
-                    String adressUser = "Adres: " + (String) snapshot.getData().get("adressUser");
-                    String cityUser = "Miasto: " + (String) snapshot.getData().get("cityUser");
-                    String postCodeUser = "Kod pocztowy: " + (String) snapshot.getData().get("postCodeUser");
-                    String telephoneUser = "Nr telefonu: " + (String) snapshot.getData().get("telephoneUser");
+                    String emailUserAndDescriptionFromSnapShot = emailUser;
+                    String nameAndSurnameUserFromSnapShot = (String) snapshot.getData().get("nameAndSurnameUser");
+                    String adressUserFromSnapShot = (String) snapshot.getData().get("adressUser");
+                    String cityUserFromSnapShot = (String) snapshot.getData().get("cityUser");
+                    String postCodeUserFromSnapShot = (String) snapshot.getData().get("postCodeUser");
+                    String telephoneUserFromSnapShot = (String) snapshot.getData().get("telephoneUser");
+
+                    // sprawdzenie czy dane nie są null
+                    if (emailUserAndDescriptionFromSnapShot == null) {
+                        emailUserAndDescriptionFromSnapShot = "";
+                    }
+                    if (nameAndSurnameUserFromSnapShot == null) {
+                        nameAndSurnameUserFromSnapShot = "";
+                    }
+                    if (adressUserFromSnapShot == null) {
+                        adressUserFromSnapShot = "";
+                    }
+                    if (cityUserFromSnapShot == null) {
+                        cityUserFromSnapShot = "";
+                    }
+                    if (postCodeUserFromSnapShot == null) {
+                        postCodeUserFromSnapShot = "";
+                    }
+                    if (telephoneUserFromSnapShot == null) {
+                        telephoneUserFromSnapShot = "";
+                    }
 
                     // dodanie danych do textViews z danymi uzytkownika
-                    textViewUserEmail.setText("Email: " + emailUser);
+                    String emailUserAndDescription = "E-mail: " + emailUserAndDescriptionFromSnapShot;
+                    String nameAndSurnameUser = "Name: " + nameAndSurnameUserFromSnapShot;
+                    String adressUser = "Address: " + adressUserFromSnapShot;
+                    String cityUser = "City: " + cityUserFromSnapShot;
+                    String postCodeUser = "ZIP code: " + postCodeUserFromSnapShot;
+                    String telephoneUser = "Phone number: " + telephoneUserFromSnapShot;
+                    textViewUserEmail.setText("E-mail: " + emailUser);
                     textViewUserNameAndSurname.setText(nameAndSurnameUser);
                     textViewUserAdres.setText(adressUser);
                     textViewUserMiasto.setText(cityUser);

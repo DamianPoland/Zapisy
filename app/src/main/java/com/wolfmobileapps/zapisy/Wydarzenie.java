@@ -137,7 +137,7 @@ public class Wydarzenie {
                     @Override
                     public void onSuccess(Void aVoid) {
                         if (objectWyd.getWydarzenieHistoria() == true){
-                            Toast.makeText(context, "Wydarzenie przeniesione do historii", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Event moved to history", Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -158,13 +158,13 @@ public class Wydarzenie {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(context, "Wydarzenie usunięte", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Event deleted", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, "Error - wydarzenie nie usunięte", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Error - event not deleted", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

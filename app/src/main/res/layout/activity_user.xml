@@ -35,7 +35,7 @@
                     android:id="@+id/textViewActivityUserOpis"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Panel użytkownika"
+                    android:text="User panel"
                     android:textAlignment="center"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
@@ -51,7 +51,7 @@
                         android:id="@+id/textViewUserEmail"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Email: "
+                        android:text="E-mail: "
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -59,7 +59,7 @@
                         android:id="@+id/textViewUserNameAndSurname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Imię i Nazwisko:"
+                        android:text="Name:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -67,7 +67,7 @@
                         android:id="@+id/textViewUserAdres"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Adres:"
+                        android:text="Address:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -75,7 +75,7 @@
                         android:id="@+id/textViewUserMiasto"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Miasto:"
+                        android:text="City:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -83,7 +83,7 @@
                         android:id="@+id/textViewUserKodPocztowy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kod pocztowy:"
+                        android:text="ZIP code:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -91,7 +91,7 @@
                         android:id="@+id/textViewUserNrTelefonu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nr telefonu:"
+                        android:text="Phone number:"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -105,7 +105,7 @@
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Zmień dane"
+                    android:text="Change the data"
                     android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
 
@@ -128,7 +128,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Edycja danych"
+                    android:text="Edit the data:"
                     android:textAlignment="center"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
@@ -144,7 +144,7 @@
                         android:id="@+id/editTextUserNameAndSurname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Wpisz Imię i nazwisko"
+                        android:hint="My name"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -152,7 +152,7 @@
                         android:id="@+id/editTextUserAdres"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Wpisz Adres"
+                        android:hint="My address"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -160,7 +160,7 @@
                         android:id="@+id/editTextUserMiasto"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Wpisz Miasto"
+                        android:hint="My city"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -168,7 +168,7 @@
                         android:id="@+id/editTextUserKodPocztowy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Wpisz Kod pocztowy"
+                        android:hint="My ZIP code"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -176,7 +176,7 @@
                         android:id="@+id/editTextUserNrTelefonu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Wpisz Nr telefonu"
+                        android:hint="My phone number"
                         android:textColor="@color/colorPrimaryDarkBlue900"
                         android:textSize="14sp" />
 
@@ -190,7 +190,7 @@
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Zapisz dane"
+                    android:text="save the data"
                     android:textColor="@color/colorWhite"
                     android:textStyle="bold" />
 
@@ -202,7 +202,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
-                android:text="Wydarzenia do których dołączyłeś:"
+                android:text="Events you joined:"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />

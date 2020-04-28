@@ -213,7 +213,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Dystans:" />
+                            android:text="Distance:" />
 
                         <TextView
                             android:id="@+id/textViewActivityWydarzenieCzasFIREBASE"
@@ -221,7 +221,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Czas::" />
+                            android:text="Time:" />
 
                         <TextView
                             android:id="@+id/textViewActivityWydarzeniePredkoscFIREBASE"
@@ -229,7 +229,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Prędkość:" />
+                            android:text="Speed:" />
 
                     </LinearLayout>
 
@@ -256,7 +256,7 @@
                     android:id="@+id/textViewNagrajTrase"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    tools:text="Nagraj trasę"
+                    tools:text="Record route"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:layout_gravity="center_horizontal"/>
@@ -293,7 +293,7 @@
                     android:background="@drawable/item_ripple_for_button"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Wyniki"
+                    android:text="Results"
                     android:textColor="@color/colorWhite"
                     android:textStyle="bold"
                     android:visibility="gone"
@@ -329,7 +329,7 @@
                     android:id="@+id/textViewOstatniaNagranaTrasa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Twoja nagrana trasa to:"
+                    android:text="My recorded route:"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
@@ -365,7 +365,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Dystans:"/>
+                            android:text="Distance:"/>
 
                         <TextView
                             android:id="@+id/textViewActivityWydarzenieCzas"
@@ -373,7 +373,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Czas:"/>
+                            android:text="Time:"/>
 
                         <TextView
                             android:id="@+id/textViewActivityWydarzeniePredkosc"
@@ -381,7 +381,7 @@
                             android:layout_height="wrap_content"
                             android:textSize="14sp"
                             android:textColor="@color/colorPrimaryDarkBlue900"
-                            android:text="Prędkość:"/>
+                            android:text="Speed:"/>
 
 
                     </LinearLayout>
@@ -401,7 +401,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:background="@drawable/item_ripple_for_button"
-                        android:text="Skasuj"
+                        android:text="Remove"
                         android:textColor="@color/colorWhite"
                         android:textStyle="bold"
                         android:paddingStart="16dp"
@@ -412,7 +412,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:background="@drawable/item_ripple_for_button"
-                        android:text="Wyslij"
+                        android:text="Send"
                         android:textColor="@color/colorWhite"
                         android:textStyle="bold"
                         android:layout_marginStart="8dp"

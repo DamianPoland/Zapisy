@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Wydarzenie> listMain;
     private WydarzeniaArrayAdapter adapter;
 
-    public static final String[] TABLE_OF_ADMINS = {"damianpltf@gmailcom", "marekwichura1969@gmailcom", "wolfmobileapps@gmailcom", "miotkseba@gmailcom"}; // admin z dostępem do panelu admina - musi być 4!
+    public static final String[] TABLE_OF_ADMINS = {"damianwilczynskipl@gmailcom"}; // admin z dostępem do panelu admina - musi być 1!
 
 
 
@@ -112,16 +112,16 @@ public class MainActivity extends AppCompatActivity {
         progressBarWaiForFirebase = findViewById(R.id.progressBarWaiForFirebase);
 
         // ustawienie textu na textView Witaj, jeśli użytkownik ma zapisane imię to się wyświetli
-        textViewWitaj.setText("Witaj!");
+        textViewWitaj.setText("Hi!");
         if (!shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "none").equals("none")) {
-            textViewWitaj.setText("Witaj " + shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "none") + " !");
+            textViewWitaj.setText("Hi " + shar.getString(TO_ACTIVITY_WYDARZENIE_USER_NAME, "none") + " !");
         }
 
         // ustawienie textu na textView OpisOgólny
-        textViewOpisOgolny.setText("Znajdziesz tu aktualne wydarzenia z całej Polski. Aby się zapisać lud dowiedzieć więcej kliknij w wydarzenie.");
+        textViewOpisOgolny.setText("Here you will find current events from around the world. Click an event to find more information.");
 
         // ustawienie textu na textView Wydarzenia
-        textViewWydarzenia.setText("Wydarzenia:");
+        textViewWydarzenia.setText("Events:");
 
 
 //        //ustawienie action bara
@@ -260,9 +260,9 @@ public class MainActivity extends AppCompatActivity {
 
                     // musi byc alert dialog bo inaczej jak ktoś kliknął onBackPressed to nie wracało do głównego activity a traz wraca
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Logowanie");
-                    builder.setMessage("Aby przejść dalej musisz być zalogowany poprzez konto Google.");
-                    builder.setPositiveButton("Zaloguj", new DialogInterface.OnClickListener() {
+                    builder.setTitle("Log in");
+                    builder.setMessage("To proceed, you must be logged in via a Google account.");
+                    builder.setPositiveButton("Log in", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                                             .build(),
                                     RC_SIGN_IN);
                         }
-                    }).setNegativeButton("NIE loguj", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // do something when click cancel
@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
         //ustawienie widoczności guzika dla admina
         String emailAdmin = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, "");
-        if (emailAdmin.equals(TABLE_OF_ADMINS[0]) || emailAdmin.equals(TABLE_OF_ADMINS[1]) || emailAdmin.equals(TABLE_OF_ADMINS[2]) || emailAdmin.equals(TABLE_OF_ADMINS[3])) {
+        if (emailAdmin.equals(TABLE_OF_ADMINS[0])) {
             MenuItem item = menu.findItem((R.id.menu_admin));
             item.setVisible(true);
         }

@@ -126,7 +126,7 @@ public class ActivityWyniki extends AppCompatActivity {
 
         // ustawienie textViews
         textViewTytulWyniki.setText(tytul);
-        textViewActivityWydarzenieDystansWyniki.setText("Dystans: " + dystans + " km");
+        textViewActivityWydarzenieDystansWyniki.setText("Distance: " + dystans + " km");
 
         // lista ze wszystkimi trasami w Stringach
         listOfRouds = new ArrayList<>();
@@ -145,14 +145,14 @@ public class ActivityWyniki extends AppCompatActivity {
 
                 //ustawienie widoczności guzika dla admina
                 String emailAdmin = shar.getString(TO_ACTIVITY_WYDARZENIE_USER_EMAIL, "");
-                if (emailAdmin.equals(TABLE_OF_ADMINS[0]) || emailAdmin.equals(TABLE_OF_ADMINS[1]) || emailAdmin.equals(TABLE_OF_ADMINS[2]) || emailAdmin.equals(TABLE_OF_ADMINS[3])) {
+                if (emailAdmin.equals(TABLE_OF_ADMINS[0])) {
 
 
                     // alert z pytaniem czy usunąć wynik
                     AlertDialog.Builder builder = new AlertDialog.Builder(ActivityWyniki.this);
-                    builder.setTitle("USUWANIE");
-                    builder.setMessage("Czy napewno chcesz usunąć ten wynik z bazy?");
-                    builder.setPositiveButton("TAK", new DialogInterface.OnClickListener() {
+                    builder.setTitle("Deletind");
+                    builder.setMessage("Are you sure you want to delete this result from the database?");
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
@@ -164,7 +164,7 @@ public class ActivityWyniki extends AppCompatActivity {
                             DaneTrasy daneTrasy = new DaneTrasy();
                             daneTrasy.deleteDataDataFirebase(ActivityWyniki.this,COLLECTION_NAME_WYDARZENIE, dbNameCollection, COLLECTION_NAME_UCZESTNICY, userEmail);
                         }
-                    }).setNegativeButton("NIE", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // nic nie robi

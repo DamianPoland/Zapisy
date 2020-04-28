@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <item android:drawable="@color/colorPrimaryDarkBlue900" android:state_pressed="true">
+    <item android:drawable="@color/colorPrimaryBrightBlue200" android:state_pressed="true">
 
     </item>
     <item android:drawable="@android:color/white">

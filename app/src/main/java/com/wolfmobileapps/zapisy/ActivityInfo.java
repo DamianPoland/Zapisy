@@ -35,7 +35,7 @@ public class ActivityInfo extends AppCompatActivity {
         info = findViewById(R.id.info);
 
         //ustawienie górnej nazwy i strzałki do powrotu
-        getSupportActionBar().setTitle("Powrót"); //ustawia nazwę na górze
+        getSupportActionBar().setTitle("About"); //ustawia nazwę na górze
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // ustawia strzałkę
 
         //ustavienie zazwy wersji z gradle
@@ -45,7 +45,7 @@ public class ActivityInfo extends AppCompatActivity {
         version.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String titule = "Versja:";
+                String titule = "Version:";
                 String alertString = BuildConfig.VERSION_NAME;
                 createAlertDialog(titule, alertString);
             }
@@ -54,8 +54,8 @@ public class ActivityInfo extends AppCompatActivity {
         owner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String titule = "Właściciel:";
-                String alertString = "M Group \nSebastian Miotk \nzapisy.info";
+                String titule = "Owner:";
+                String alertString = "R&S";
                 createAlertDialog(titule, alertString);
             }
         });
@@ -72,7 +72,7 @@ public class ActivityInfo extends AppCompatActivity {
         privacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String titule = "Polityka prywatności";
+                String titule = "Privacy policy";
                 String alertString = getResources().getString(R.string.privacy_policy_description);
                 createAlertDialog(titule, alertString);
             }
@@ -82,7 +82,7 @@ public class ActivityInfo extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String titule = "Developer Info";
-                String alertString = "Kontakt:  \n\nwww.wolfmobileapps.com";
+                String alertString = "Contact:  \nPoland \nwww.wolfmobileapps.com";
                 createAlertDialog(titule, alertString);
             }
         });
@@ -95,7 +95,7 @@ public class ActivityInfo extends AppCompatActivity {
         builder.setTitle(titule);
         if (titule.equals("Developer Info")) {
             builder.setIcon(R.drawable.wolf_icon);
-            builder.setNegativeButton("Odwiedź stronę", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("Open website", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Uri webpage = Uri.parse("http://wolfmobileapps.com");
@@ -107,7 +107,7 @@ public class ActivityInfo extends AppCompatActivity {
             });
         }
         builder.setMessage(alertString);
-        builder.setPositiveButton("ZAMKNIJ", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //do something when click OK

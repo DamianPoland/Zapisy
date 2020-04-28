@@ -248,7 +248,7 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_timer_off_black_24dp)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("Zakończono nagrywanie trasy!")
+                .setContentText("Route recording finished!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(Notification.DEFAULT_SOUND) // dodano dzwiek w API<26 (Oero)
                 .setContentIntent(pendingIntent)
@@ -267,7 +267,7 @@ public class ServiceWydarzenie extends Service implements LocationListener {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_directions_walk_black_24dp)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("Trwa rejestowanie Twojej trasy...")
+                .setContentText("Your route is recording...")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);

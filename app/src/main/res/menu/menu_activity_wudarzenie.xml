@@ -4,6 +4,6 @@
 
     <item
         android:id="@+id/menu_regulamin"
-        android:title="Regulamin"
+        android:title="Regulations"
         app:showAsAction="ifRoom" />
 </menu>

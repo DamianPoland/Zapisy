@@ -22,7 +22,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="O aplikacji"
+                    android:text="About"
                     android:textColor="@color/colorAccentRed900"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -45,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Versja"
+                        android:text="Version"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -78,7 +78,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Właściciel"
+                        android:text="Owner"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -86,7 +86,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Właściciel aplikacji"
+                        android:text="App owner"
                         android:textSize="14sp" />
 
                     <TextView
@@ -145,7 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Polityka prywatności"
+                        android:text="Privacy policy"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
@@ -153,7 +153,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Inofmacje o polityce prywatności"
+                        android:text="Info about privacy policy"
                         android:textSize="14sp" />
 
                     <TextView

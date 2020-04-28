@@ -29,8 +29,8 @@ public class WynikiArrayAdapter extends ArrayAdapter<DaneTrasy> {
         String imie = currentItem.getUserEmail();
         String[] parts = imie.split("@");
         String imiePart1 = parts[0];
-        text2.setText("Imię: " + imiePart1);
-        text3.setText("Czas: " + currentItem.getFullTime() + " s");
+        text2.setText("Name: " + imiePart1);
+        text3.setText("Time: " + currentItem.getFullTime() + " s");
 
         return convertView;
     }

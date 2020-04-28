@@ -32,13 +32,13 @@ public class WydarzeniaArrayAdapter extends ArrayAdapter<Wydarzenie> {
         boolean historia = currentItem.getWydarzenieHistoria();
         String wydarzenieTytul = currentItem.getWydarzenieTytul();
         if (historia){
-            wydarzenieTytul = "Wydarzenie przeniesione do historii:\n\n" + wydarzenieTytul;
+            wydarzenieTytul = "Event moved to history:\n\n" + wydarzenieTytul;
         }
 
         text1.setText(wydarzenieTytul);
-        text2.setText("Data: " + currentItem.getWydarzenieData());
-        text3.setText("Dystans: " + currentItem.getWydarzenieDystans() + " km");
-        text4.setText("Uczestnicy: " + Math.round(currentItem.getWydarzenieUczestnicyIlosc()));
+        text2.setText("Date: " + currentItem.getWydarzenieData());
+        text3.setText("Distance: " + currentItem.getWydarzenieDystans() + " km");
+        text4.setText("Participants: " + Math.round(currentItem.getWydarzenieUczestnicyIlosc()));
         return convertView;
     }
     public WydarzeniaArrayAdapter(Context context, int resource, List objects) {
